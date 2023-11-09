@@ -1197,4 +1197,13 @@ on prompt with the `my=search-url' prefix and handled by
              (read-string "[firefox] search thing: "
                           (thing-at-point 'symbol)))))))
 
+(defmacro my=def-evar (elisp-var def-val evar-name)
+  "Define an Emacs variable from environment with defaults. Warn if
+differences were encountered."
+  `(let* ((evar-val (or (getenv ,evar-name) ,def-val)))
+     (setq ,elisp-var (or (getenv ,evar-name) ,def-val))
+     (unless (string= ,elisp-var ,def-val)
+       (message "WARN def-val %s and evar %s=%s differ"
+                ,def-val ,evar-name evar-val))))
+
 (provide 'tweaks)
