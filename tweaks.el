@@ -990,33 +990,43 @@ Evil substitute / replace command:
   (and (member bufname (mapcar #'buffer-name (buffer-list)))
        t))
 
-;; TODO add SHELL-PATH parameter so for setting
-;;   (setq shell-pop-term-shell SHELL-PATH)
-;; and also probably the `multi-term-program'
 (defun my=toggle-shell-pop-some-term (term-type &optional ARG)
-  "term-type is 'term or 'multiterm"
+  "term-type is 'term or 'multiterm.
+
+Consider:
+1. defining SHELL_PATH environment variable
+2. setting:
+  (setq shell-pop-term-shell SHELL_PATH)
+  (setq multi-term-program SHELL_PATH)"
   (if (not (cl-find term-type '(multiterm term)))
       ;; (error "Unknown term-type: %s. Expecting 'term or 'multiterm" term-type)
       (message "Unknown term-type. Expecting 'term or 'multiterm")
-    (let ((default-buffer
+    (let* ((index 0)
+           (default-buffer
             ;; "*Default-multiterm-0*"
-            (format "*Default-%s-0*" term-type)
+            (format "*Default-%s-%s*" term-type index)
             ))
       (cond
+       ;; If inside a terminal buffer then close / delete it.
        ;; 'term-mode' works apparently also for multiterm
        ((equal 'term-mode major-mode)
         (my=delete-window))
 
        ;; can't use (let ...) inside cond
        ((buffer-exists-p default-buffer)
-        (pop-to-buffer default-buffer))
+        (progn
+          (message "##### (buffer-exists-p %s): t" default-buffer)
+          ;; (display-buffer default-buffer)
+          (pop-to-buffer default-buffer)
+          ))
 
        (t
+        (message "##### else: (buffer-exists-p %s): nil " default-buffer)
         ;; `spacemacs/shell-pop-term' and `spacemacs/shell-pop-multiterm'
         ;; are defined in layers/+tools/shell/packages.el
         (cond
          ((equal term-type 'multiterm) (spacemacs/shell-pop-multiterm ARG))
-         ((equal term-type 'term) (spacemacs/shell-pop-term ARG)))))
+         ((equal term-type 'term)      (spacemacs/shell-pop-term ARG)))))
       (balance-windows-area))))
 
 (defun my=toggle-shell-pop-term (&optional ARG)
