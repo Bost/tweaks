@@ -1218,4 +1218,24 @@ differences were encountered."
        (message "WARN def-val %s and evar %s=%s differ"
                 ,def-val ,evar-name evar-val))))
 
+(defun my=range (&optional start end step)
+  "Should behave like `range' in Clojure.
+
+   Generate a list of numbers from START to END, incrementing by STEP.
+   If END is nil, then START defaults to 0 and END is taken from the first argument.
+   STEP defaults to 1."
+  (unless end
+    (setq end start
+          start 0))
+  (unless step
+    (setq step 1))
+  (let ((range-list '())
+        (i start))
+    (while (if (> step 0)
+               (< i end)
+             (> i end))
+      (push i range-list)
+      (setq i (+ i step)))
+    (nreverse range-list)))
+
 (provide 'tweaks)
