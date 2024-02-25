@@ -1182,30 +1182,32 @@ immediately opened by `browse-url-firefox', anything else is put
 on prompt with the `my=search-url' prefix and handled by
 `browse-url-firefox'."
   (interactive "p")
-  (cond
-   ((or (region-active-p) (evil-visual-state-p))
-    ;; Select text as if done from the insert state.
-    (browse-url-firefox
+  (funcall
+   (-compose
+    #'browse-url-firefox
+    ;; (-partial #'message "[my=search-or-browse] url: %s"))
+   (cond
+    ((or (region-active-p) (evil-visual-state-p))
+     ;; Select text as if done from the insert state.
      (format my=search-url
              (read-string "[firefox] search region: "
                           (buffer-substring-no-properties (region-beginning)
-                                                          (region-end))))))
+                                                          (region-end)))))
 
-   ((let ((url-string (thing-at-point 'url)))
-      (or
-       (string-prefix-p "https://youtu.be" url-string)
-       (string-prefix-p "https://www.youtube" url-string)))
-    (browse-url-firefox (thing-at-point 'url)))
+    ((let ((url-string (thing-at-point 'url)))
+       (or
+        (string-prefix-p "https://youtu.be" url-string)
+        (string-prefix-p "https://www.youtube" url-string)))
+     (thing-at-point 'url))
 
-   ;; test http://bla.com
-   ((string-prefix-p "http" (thing-at-point 'url))
-    (browse-url-firefox (thing-at-point 'url)))
+    ;; test http://bla.com
+    ((string-prefix-p "http" (thing-at-point 'url))
+     (thing-at-point 'url))
 
-   (t
-    (browse-url-firefox
+    (t
      (format my=search-url
              (read-string "[firefox] search thing: "
-                          (thing-at-point 'symbol)))))))
+                          (thing-at-point 'symbol))))))))
 
 (defmacro my=def-evar (elisp-var def-val evar-name)
   "Define an Emacs variable from environment with defaults. Warn if
