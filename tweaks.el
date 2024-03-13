@@ -1,6 +1,6 @@
-;;; tweaks.el --- Various tweaks.
+;;; tweaks.el --- Various tweaks.                    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 - 2023 Rostislav Svoboda
+;; Copyright (C) 2020 - 2024 Rostislav Svoboda
 
 ;; Authors: Rostislav Svoboda <Rostislav.Svoboda@gmail.com>
 ;; Version: 0.1
@@ -62,7 +62,6 @@ Version: 2017-01-11"
       (goto-char (point-min))
       (while (search-forward "\\\"" nil t)
         (replace-match "\"" t t)))))
-
 
 (defun my=shell-which (command)
   "Execute the 'which' command in the current shell"
@@ -223,7 +222,7 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
               (exchange-point-and-mark)) ;; moving back
           (set-mark (point))
           (right-char (length sel-text))))
-    (spacemacs/helm-project-smart-do-search-region-or-symbol)
+    (spacemacs/hsearch-project-region-or-symbol)
     ;; (message "was-visual-state-p: %s" was-visual-state-p)
     ))
 
