@@ -29,6 +29,11 @@
 (require 'magit)
 (require 'yasnippet)
 
+;; TODO lazy loading
+(provide 'zoom-frm) ;; zoom-all-frames-in, zoom-all-frames-out
+(require 'evil-iedit-state) ;; evil-iedit-state/quit-iedit-mode
+(require 'cider-repl) ;; cider-repl-tab, etc.
+
 (defun tw-escape-quotes (Begin End)
   "Add slash before double quote in current line or selection.
 Double quote is codepoint 34.
@@ -64,7 +69,7 @@ Version: 2017-01-11"
         (replace-match "\"" t t)))))
 
 (defun tw-shell-which (command)
-  "Execute the 'which' command in the current shell"
+  "Execute the \\='which\\=' command in the current shell"
   (funcall
    (-compose
     ;; TODO implement fallback to bash if fish not found
@@ -82,31 +87,33 @@ Version: 2017-01-11"
                   (get-char-property (point) 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 
-(defun tw-hilight-duplicate-lines()
-  (interactive)
-  (let ((count 0)
-        line-re)
-    (save-excursion
-      (goto-char (point-min))
-      (while (not (eobp))
-        (setq count 0
-              line-re (concat "^" (regexp-quote
-                                   (buffer-substring-no-properties
-                                    (line-beginning-position)
-                                    (line-end-position)))
-                              "$"))
-        (save-excursion
-          (goto-char (point-min))
-          (while (not (eobp))
-            (if (not (re-search-forward line-re nil t))
-                (goto-char (point-max))
-              (setq count (1+ count))
-              (unless (< count 2)
-                (hlt-highlight-region (line-beginning-position)
-                                      (line-end-position)
-                                      'font-lock-warning-face)
-                (forward-line 1)))))
-        (forward-line 1)))))
+;;; hlt-highlight-region needs (require 'highlight), otherwise it throws an
+;;; error: "hlt-highlight-region undefined".
+;; (defun tw-hilight-duplicate-lines ()
+;;   (interactive)
+;;   (let ((count 0)
+;;         line-re)
+;;     (save-excursion
+;;       (goto-char (point-min))
+;;       (while (not (eobp))
+;;         (setq count 0
+;;               line-re (concat "^" (regexp-quote
+;;                                    (buffer-substring-no-properties
+;;                                     (line-beginning-position)
+;;                                     (line-end-position)))
+;;                               "$"))
+;;         (save-excursion
+;;           (goto-char (point-min))
+;;           (while (not (eobp))
+;;             (if (not (re-search-forward line-re nil t))
+;;                 (goto-char (point-max))
+;;               (setq count (1+ count))
+;;               (unless (< count 2)
+;;                 (hlt-highlight-region (line-beginning-position)
+;;                                       (line-end-position)
+;;                                       'font-lock-warning-face)
+;;                 (forward-line 1)))))
+;;         (forward-line 1)))))
 
 (defun tw-buffer-mode (buffer-or-string)
   "Returns the major mode associated with a buffer.
@@ -128,13 +135,14 @@ Example: (tw-buffer-mode (current-buffer))"
 
 (defun tw-split-other-window-below ()
   (interactive)
-  (tw-split-other-window-and 'split-window-below))
+  (tw-split-other-window-and #'split-window-below))
 
 (defun tw-split-window-right-and-focus (&optional size)
   (interactive)
+  (ignore size)
   ;; (split-window-right-and-focus)
-  (tw-split-other-window-and 'split-window-right-and-focus)
-  ;; (tw-split-other-window-and 'split-window-right)
+  (tw-split-other-window-and #'split-window-right-and-focus)
+  ;; (tw-split-other-window-and #'split-window-right)
   )
 
 (defun tw-evil-insert ()
@@ -177,12 +185,13 @@ Example: (tw-buffer-mode (current-buffer))"
   (tw-zoom-all-frames #'zoom-all-frames-out))
 
 (defun tw-disable-y-or-n-p (orig-fun &rest args)
-  (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
+  (cl-letf (((symbol-function 'y-or-n-p) (lambda (_) t)))
     (apply orig-fun args)))
 
 (defun tw-ediff-buffers-left-right (&optional arg)
   "ediff buffers in the left and right panel"
   (interactive "p")
+  (ignore arg)
   ;; make the current buffer to be the lef buffer thus prevent ediff swapping
   ;; left and right buffers; `windmove-left' signals an error if no window is at
   ;; the desired location(, unless <not my case>)
@@ -207,6 +216,7 @@ Example: (tw-buffer-mode (current-buffer))"
   "Search for selected text in the project. Even in visual state.
 See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
   (interactive "p")
+  (ignore arg)
   (let (;; TODO optionaly reselect last selected text
         ;; (was-normal-state-p (evil-normal-state-p))
         (was-visual-state-p (evil-visual-state-p)))
@@ -247,12 +257,14 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
 
 (defun tw-yank-and-select ()
   (interactive)
-  (let ((point-begin (point)))
-    ;; (clipboard-yank)
-    (yank)
-    ;; (evil-visual-make-selection)
-    ;; (evil-visual-select point-begin (- (point) 1))
-    (tw-evil-select-pasted)))
+  ;; (let ((point-begin (point)))
+  ;;   (clipboard-yank)
+  ;;   (yank)
+  ;;   (evil-visual-make-selection)
+  ;;   (evil-visual-select point-begin (- (point) 1))
+  ;;   (tw-evil-select-pasted))
+  (yank)
+  (tw-evil-select-pasted))
 
 (defun tw-shenanigans-on ()
   "Switch on most of the graphical goodies. Inverse of
@@ -293,6 +305,7 @@ large files. Inverse of `tw-shenanigans-on'."
   "Delete the sexp (balanced expression) following point w/o
 yanking it. See `kill-sexp'."
   (interactive "p")
+  (ignore arg)
   (let ((beg (point)))
     (forward-sexp 1)
     (let ((end (point)))
@@ -302,6 +315,7 @@ yanking it. See `kill-sexp'."
   "Delete the sexp (balanced expression) following point w/o
 yanking it. See `kill-sexp'."
   (interactive "p")
+  (ignore arg)
   (let ((beg (point)))
     (forward-sexp -1)
     (let ((end (point)))
@@ -319,7 +333,7 @@ the (^:fold ...) expressions."
 
      (while (ignore-errors (re-search-forward "\\^:fold"))
        (hs-hide-block)
-       (next-line)))))
+       (forward-line)))))
 
 ;; deving on clojure-mode; WARNING: (getenv "dev") is undefined
 (defun load-clojure-mode (file)
@@ -341,7 +355,7 @@ Repeated invocations toggle between the two most recently open buffers."
   "Start figwheel"
   (interactive)
   (save-some-buffers)
-  (with-current-buffer (cider-current-repl-buffer)
+  (with-current-buffer (cider-current-repl)
     (goto-char (point-max))
     (insert "(require 'figwheel-sidecar.repl-api)
 ;; start-figwheel can be repeatedly called (is idempotent)
@@ -416,6 +430,7 @@ E.g.:
      :%s#\\=\\<\\=\\>##gc     - places the point between `\<' and `\>'
      :%s#fox#fox#gc   - places the point after the first `x'"
   (interactive "p")
+  (ignore args)
   (sp-copy-sexp)
   (evil-normal-state)
   (let* (;; Example 1.:
@@ -433,6 +448,7 @@ E.g.:
 
 (defun tw-search-namespace (&optional args)
   (interactive "p")
+  (ignore args)
   (sp-copy-sexp)
   ;; (message "%s" kill-ring)
   (evil-normal-state)
@@ -483,27 +499,21 @@ E.g.:
       ;; (evil-iedit-state/iedit-mode) ;; M-H iedit-restrict-function
       (setq tw-iedit-mode t))))
 
-(defun tw-eval-current-defun1 (arg)
-  "Doesn't work if there's a \"\" or () at the end of the function"
-  (interactive "P")
-  (let* ((point-pos (point)))
-    (while (and (not (tw-is-defun))
-                (not (= (point) (point-min))))
-      (sp-backward-symbol))
-    (if t ;; (not (= point-pos (point)))
-        (let* ((before-up (point)))
-          (sp-up-sexp)
-          (if (= before-up (point))
-              (sp-forward-sexp))))
-    ;; eval-sexp-fu-flash-mode is buggy
-    (eval-last-sexp arg)
-    (goto-char point-pos)))
-
-;; (defun afoo () (message (format "")))
-
-;; (defun af ()
-;;   (defun bf ()
-;;     (defun cf ())))
+;; (defun tw-eval-current-defun1 (arg)
+;;   "Doesn't work if there's a \"\" or () at the end of the function"
+;;   (interactive "P")
+;;   (let* ((point-pos (point)))
+;;     (while (and (not (tw-is-defun))
+;;                 (not (= (point) (point-min))))
+;;       (sp-backward-symbol))
+;;     (if t ;; (not (= point-pos (point)))
+;;         (let* ((before-up (point)))
+;;           (sp-up-sexp)
+;;           (if (= before-up (point))
+;;               (sp-forward-sexp))))
+;;     ;; eval-sexp-fu-flash-mode is buggy
+;;     (eval-last-sexp arg)
+;;     (goto-char point-pos)))
 
 (defun tw-eval-current-defun2 (arg)
   (interactive "P")
@@ -520,11 +530,12 @@ E.g.:
     (goto-char point-pos)))
 
 (defun tw-eval-current-defun (arg)
-  "Evaluate the current i.e. inner def un.
-E.g. in the (def un a () (def un b () (def un c ()))) this function allows
-selective evaluation 'c' or 'b' or 'a' according to the point possition in
-contrast to `eval-defun' which always evaluates just 'a' no matter where the
-point is.
+  "Evaluate the current i.e. inner defun.
+E.g. in the (def un a () (def un b () (def un c ()))) this
+function allows selective evaluation \\='c\\=' or \\='b\\=' or
+\\='a\\=' according to the point possition in contrast to
+`eval-defun' which always evaluates just \\='a\\=' no matter
+where the point is.
 TODO still buggy - when not in a defun it evaluates preceding defun"
   (interactive "P")
   (let* ((point-pos (point)))
@@ -797,14 +808,14 @@ TODO finish the implementation"
 (defun tw-magit-status ()
   (interactive)
   (tw-save-all-buffers)
-  (magit-status))
+  (magit-status-setup-buffer))
 
 (defun tw-cider-insert-and-format (form)
   (interactive)
   (tw-repl-insert-cmd (concat (mapconcat 'identity form "\n")))
   (evil-normal-state)
   (evil-jump-item)
-  (dolist (line (cdr form))
+  (dolist (_ (cdr form))
     (evil-next-visual-line)
     (cider-repl-tab))
   (evil-append-line 0))
@@ -945,7 +956,8 @@ Evil substitute / replace command:
   (interactive)
   (when (equal major-mode 'dired-mode)
     ;; if currently showing
-    (if (or (not (boundp 'dired-dotfiles-show-p)) dired-dotfiles-show-p)
+    (if (or (not (boundp 'dired-dotfiles-show-p))
+            (and (boundp 'dired-dotfiles-show-p) dired-dotfiles-show-p))
         (progn
           (set (make-local-variable 'dired-dotfiles-show-p) nil)
           (message "h")
@@ -964,15 +976,14 @@ Evil substitute / replace command:
 
 (defun tw-delete-window ()
   (interactive)
-  (let ((win-list (window-list)))
-    (if (funcall (-compose (-partial #'equal 1)
-                           #'length
-                           #'delete-dups
-                           (-partial #'mapcar (-compose #'buffer-name
-                                                        #'window-buffer)))
-                 (window-list))
-        (spacemacs/alternate-buffer)
-      (delete-window (selected-window)))))
+  (if (funcall (-compose (-partial #'equal 1)
+                         #'length
+                         #'delete-dups
+                         (-partial #'mapcar (-compose #'buffer-name
+                                                      #'window-buffer)))
+               (window-list))
+      (spacemacs/alternate-buffer)
+    (delete-window (selected-window))))
 
 (defun tw-ins-left-paren ()
   "Simulate key press" (interactive) (execute-kbd-macro (kbd "(")))
@@ -990,7 +1001,7 @@ Evil substitute / replace command:
        t))
 
 (defun tw-toggle-shell-pop-some-term (term-type &optional ARG)
-  "term-type is 'term or 'multiterm.
+  "term-type is \\='term\\=' or \\='multiterm\\='.
 
 Consider:
 1. defining SHELL_PATH environment variable
@@ -1181,6 +1192,7 @@ immediately opened by `browse-url-firefox', anything else is put
 on prompt with the `tw-search-url' prefix and handled by
 `browse-url-firefox'."
   (interactive "p")
+  (ignore args)
   (funcall
    (-compose
     #'browse-url-firefox
@@ -1220,9 +1232,9 @@ differences were encountered."
 (defun tw-range (&optional start end step)
   "Should behave like `range' in Clojure.
 
-   Generate a list of numbers from START to END, incrementing by STEP.
-   If END is nil, then START defaults to 0 and END is taken from the first argument.
-   STEP defaults to 1."
+Generate a list of numbers from START to END, incrementing by
+STEP. If END is nil, then START defaults to 0 and END is taken
+from the first argument. STEP defaults to 1."
   (unless end
     (setq end start
           start 0))
