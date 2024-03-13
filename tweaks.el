@@ -29,7 +29,7 @@
 (require 'magit)
 (require 'yasnippet)
 
-(defun my=escape-quotes (Begin End)
+(defun tw-escape-quotes (Begin End)
   "Add slash before double quote in current line or selection.
 Double quote is codepoint 34.
 See also: `xah-unescape-quotes'
@@ -46,7 +46,7 @@ Version: 2017-01-11"
         (while (search-forward "\"" nil t)
           (replace-match "\\\"" t t)))))
 
-(defun my=unescape-quotes (Begin End)
+(defun tw-unescape-quotes (Begin End)
   "Replace  「\\\"」 by 「\"」 in current line or selection.
 See also: `xah-escape-quotes'
 
@@ -63,7 +63,7 @@ Version: 2017-01-11"
       (while (search-forward "\\\"" nil t)
         (replace-match "\"" t t)))))
 
-(defun my=shell-which (command)
+(defun tw-shell-which (command)
   "Execute the 'which' command in the current shell"
   (funcall
    (-compose
@@ -74,7 +74,7 @@ Version: 2017-01-11"
     (-partial #'list "which"))
    command))
 
-(defun my=what-face (pos)
+(defun tw-what-face (pos)
   ;; see also C-u C-x =
   (interactive "d")
   ;; (clojure-mode)
@@ -82,7 +82,7 @@ Version: 2017-01-11"
                   (get-char-property (point) 'face))))
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 
-(defun my=hilight-duplicate-lines()
+(defun tw-hilight-duplicate-lines()
   (interactive)
   (let ((count 0)
         line-re)
@@ -108,79 +108,79 @@ Version: 2017-01-11"
                 (forward-line 1)))))
         (forward-line 1)))))
 
-(defun my=buffer-mode (buffer-or-string)
+(defun tw-buffer-mode (buffer-or-string)
   "Returns the major mode associated with a buffer.
 Thanks to https://stackoverflow.com/a/2238589
-Example: (my=buffer-mode (current-buffer))"
+Example: (tw-buffer-mode (current-buffer))"
   (with-current-buffer buffer-or-string
     major-mode))
 
-(defun my=other-window ()
+(defun tw-other-window ()
   "straight jump to the next window: SPC 0, SPC 1 ..."
   (interactive)
   (other-window 1)
-  ;; (my=flash-active-buffer)
+  ;; (tw-flash-active-buffer)
   (beacon-blink))
 
-(defun my=split-other-window-and (f)
+(defun tw-split-other-window-and (f)
   (funcall f)
   (recenter-top-bottom))
 
-(defun my=split-other-window-below ()
+(defun tw-split-other-window-below ()
   (interactive)
-  (my=split-other-window-and 'split-window-below))
+  (tw-split-other-window-and 'split-window-below))
 
-(defun my=split-window-right-and-focus (&optional size)
+(defun tw-split-window-right-and-focus (&optional size)
   (interactive)
   ;; (split-window-right-and-focus)
-  (my=split-other-window-and 'split-window-right-and-focus)
-  ;; (my=split-other-window-and 'split-window-right)
+  (tw-split-other-window-and 'split-window-right-and-focus)
+  ;; (tw-split-other-window-and 'split-window-right)
   )
 
-(defun my=evil-insert ()
+(defun tw-evil-insert ()
   "Switch to evil insert mode."
   ;; (interactive)
   (if (not (evil-insert-state-p))
       (evil-insert 0)))
 
-(defun my=buffer-selection-show ()
+(defun tw-buffer-selection-show ()
   "Make a menu of buffers so you can manipulate buffers or the buffer list."
   (interactive)
   (bs-show nil)
-  (my=evil-insert))
+  (tw-evil-insert))
 
-(defun my=select-inner (vi-str)
+(defun tw-select-inner (vi-str)
   "Select inner part of a string surrounded by bracket / quotation chars."
   (evil-normal-state)
   (execute-kbd-macro vi-str))
 
 ;; use named functions for meaningful shortcuts in the listing
 ;; M-x which-key-show-top-level / SPC h k
-(defun my=select-in-ang-bracket () (interactive) (my=select-inner "vi<"))
-(defun my=select-in-sqr-bracket () (interactive) (my=select-inner "vi["))
-(defun my=select-in-rnd-bracket () (interactive) (my=select-inner "vi("))
-(defun my=select-in-crl-bracket () (interactive) (my=select-inner "vi{"))
-(defun my=select-in-string () (interactive) (my=select-inner "vi\""))
+(defun tw-select-in-ang-bracket () (interactive) (tw-select-inner "vi<"))
+(defun tw-select-in-sqr-bracket () (interactive) (tw-select-inner "vi["))
+(defun tw-select-in-rnd-bracket () (interactive) (tw-select-inner "vi("))
+(defun tw-select-in-crl-bracket () (interactive) (tw-select-inner "vi{"))
+(defun tw-select-in-string () (interactive) (tw-select-inner "vi\""))
 
-(defun my=zoom-all-frames (zoom-function)
+(defun tw-zoom-all-frames (zoom-function)
   (unless (functionp zoom-function)
     (require 'zoom-frm))
   (funcall zoom-function)
   (message "%s" zoom-function))
 
-(defun my=zoom-all-frames-in ()
+(defun tw-zoom-all-frames-in ()
     (interactive)
-    (my=zoom-all-frames #'zoom-all-frames-in))
+    (tw-zoom-all-frames #'zoom-all-frames-in))
 
-(defun my=zoom-all-frames-out ()
+(defun tw-zoom-all-frames-out ()
   (interactive)
-  (my=zoom-all-frames #'zoom-all-frames-out))
+  (tw-zoom-all-frames #'zoom-all-frames-out))
 
-(defun my=disable-y-or-n-p (orig-fun &rest args)
+(defun tw-disable-y-or-n-p (orig-fun &rest args)
   (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
     (apply orig-fun args)))
 
-(defun my=ediff-buffers-left-right (&optional arg)
+(defun tw-ediff-buffers-left-right (&optional arg)
   "ediff buffers in the left and right panel"
   (interactive "p")
   ;; make the current buffer to be the lef buffer thus prevent ediff swapping
@@ -192,7 +192,7 @@ Example: (my=buffer-mode (current-buffer))"
   (ediff-buffers (buffer-name) ;; current buffer is the buffer-a
                  (buffer-name (other-window 1))))
 
-(defun my=whitespace-mode-toggle ()
+(defun tw-whitespace-mode-toggle ()
   (interactive)
   (whitespace-mode 'toggle)
   (spacemacs/toggle-fill-column-indicator))
@@ -203,7 +203,7 @@ Example: (my=buffer-mode (current-buffer))"
 ;; 2. search only in .el files: TextToFind -G\.el$
 ;; (global-set-key (kbd "<f3>") 'helm-ag)
 
-(defun my=search-region-or-symbol (&optional arg)
+(defun tw-search-region-or-symbol (&optional arg)
   "Search for selected text in the project. Even in visual state.
 See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
   (interactive "p")
@@ -226,13 +226,13 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
     ;; (message "was-visual-state-p: %s" was-visual-state-p)
     ))
 
-(defun my=evil-paste-after-from-0 ()
+(defun tw-evil-paste-after-from-0 ()
   ;; TODO evaluate: paste copied text multiple times
   (interactive)
   (let ((evil-this-register ?0))
     (call-interactively 'evil-paste-after)))
 
-(defun my=evil-select-pasted ()
+(defun tw-evil-select-pasted ()
   "See also https://emacs.stackexchange.com/a/21093"
   (interactive)
   (let ((start-marker (evil-get-marker ?\[))
@@ -242,21 +242,21 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
   ;; (evil-goto-mark ?\[)
   ;; (evil-visual-char)
   ;; (evil-goto-mark ?\])
-  ;; (message "my=evil-select-pasted - does the same as the macro under: SPC g p")
+  ;; (message "tw-evil-select-pasted - does the same as the macro under: SPC g p")
   )
 
-(defun my=yank-and-select ()
+(defun tw-yank-and-select ()
   (interactive)
   (let ((point-begin (point)))
     ;; (clipboard-yank)
     (yank)
     ;; (evil-visual-make-selection)
     ;; (evil-visual-select point-begin (- (point) 1))
-    (my=evil-select-pasted)))
+    (tw-evil-select-pasted)))
 
-(defun my=shenanigans-on ()
+(defun tw-shenanigans-on ()
   "Switch on most of the graphical goodies. Inverse of
-`my=shenanigans-off'."
+`tw-shenanigans-off'."
   (interactive)
   ;; fontification is only deferred while there is input pending
   (setq jit-lock-defer-time 0)
@@ -266,9 +266,9 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
   (diff-hl-mode 1)
   (message "Shenanigans enabled"))
 
-(defun my=shenanigans-off ()
+(defun tw-shenanigans-off ()
   "Switch on most of the graphical goodies. Useful when editing
-large files. Inverse of `my=shenanigans-on'."
+large files. Inverse of `tw-shenanigans-on'."
   (interactive)
   (spacemacs/toggle-line-numbers-off)
   (buffer-disable-undo)
@@ -278,18 +278,18 @@ large files. Inverse of `my=shenanigans-on'."
   (diff-hl-mode -1)
   (message "Shenanigans disabled"))
 
-(defun my=insert-str (s &optional n-chars-back)
+(defun tw-insert-str (s &optional n-chars-back)
   (interactive "p")
   (insert s)
   (left-char n-chars-back)
-  (my=evil-insert))
+  (tw-evil-insert))
 
-(defun my=insert-group-parens ()
+(defun tw-insert-group-parens ()
   (interactive)
   (let* ((msg "\\(.*\\)"))
-    (my=insert-str msg 2)))
+    (tw-insert-str msg 2)))
 
-(defun my=delete-next-sexp (&optional arg)
+(defun tw-delete-next-sexp (&optional arg)
   "Delete the sexp (balanced expression) following point w/o
 yanking it. See `kill-sexp'."
   (interactive "p")
@@ -298,7 +298,7 @@ yanking it. See `kill-sexp'."
     (let ((end (point)))
       (delete-region beg end))))
 
-(defun my=delete-prev-sexp (&optional arg)
+(defun tw-delete-prev-sexp (&optional arg)
   "Delete the sexp (balanced expression) following point w/o
 yanking it. See `kill-sexp'."
   (interactive "p")
@@ -307,7 +307,7 @@ yanking it. See `kill-sexp'."
     (let ((end (point)))
       (delete-region end beg)))) ;; beg & end are swapped
 
-(defun my=hs-clojure-hide-namespace-and-folds ()
+(defun tw-hs-clojure-hide-namespace-and-folds ()
   "Hide the first (ns ...) expression in the file, and also all
 the (^:fold ...) expressions."
   (interactive)
@@ -331,13 +331,13 @@ the (^:fold ...) expressions."
         (message "File loaded: %s" file))
     (message "File loading failed: %s" file)))
 
-(defun my=switch-to-previous-buffer ()
+(defun tw-switch-to-previous-buffer ()
   "Switch to previously open buffer.
 Repeated invocations toggle between the two most recently open buffers."
   (interactive)
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
-(defun my=cider-figwheel-repl ()
+(defun tw-cider-figwheel-repl ()
   "Start figwheel"
   (interactive)
   (save-some-buffers)
@@ -349,15 +349,15 @@ Repeated invocations toggle between the two most recently open buffers."
 (figwheel-sidecar.repl-api/cljs-repl)")
     (cider-repl-return)
     ;; TODO (rename-buffer "*figwheel-cider*")
-    (my=evil-insert)))
+    (tw-evil-insert)))
 
-(defun my=switch-to-repl-start-figwheel ()
+(defun tw-switch-to-repl-start-figwheel ()
   "Switch to cider repl & start figwheel"
   (interactive)
   (cider-switch-to-repl-buffer)
-  (my=cider-figwheel-repl))
+  (tw-cider-figwheel-repl))
 
-(defun my=cider-switch-to-repl-buffer ()
+(defun tw-cider-switch-to-repl-buffer ()
   "Connect (if not connected yet) and switch to cider repl buffer.
 TODO redefine / parameterize for the corona_cases in the
 .dir-locals.el so that the `(cider-connect-clj)'
@@ -378,7 +378,7 @@ a parameter."
     )
   (cider-switch-to-repl-buffer))
 
-(defun my=copy-to-clipboard ()
+(defun tw-copy-to-clipboard ()
   "Copy selection to x-clipboard or clipboard."
   (interactive)
   (if (display-graphic-p)
@@ -399,7 +399,7 @@ a parameter."
                "The DISPLAY not is graphic and no region active."
                "Can't yank to the clipboard!"))))
 
-(defun my=paste-from-clipboard ()
+(defun tw-paste-from-clipboard ()
   "Paste from the x-clipboard."
   (interactive)
   (if (display-graphic-p)
@@ -409,7 +409,7 @@ a parameter."
         (message "The DISPLAY is graphic."))
     (insert (shell-command-to-string "xsel -o -b"))))
 
-(defun my=fabricate-subst-cmd (&optional args)
+(defun tw-fabricate-subst-cmd (&optional args)
   "Place prepared subst command to the echo area. Must be declared with
 `&optional args'. Otherwise it wont work.
 E.g.:
@@ -431,7 +431,7 @@ E.g.:
     ;; (cons .. offset) moves the point
     (evil-ex (cons sexp-str offset))))
 
-(defun my=search-namespace (&optional args)
+(defun tw-search-namespace (&optional args)
   (interactive "p")
   (sp-copy-sexp)
   ;; (message "%s" kill-ring)
@@ -445,17 +445,17 @@ E.g.:
     ;; (exit-minibuffer)
     ))
 
-(global-set-key (kbd "<s-f9>") 'my=search-namespace)
+(global-set-key (kbd "<s-f9>") 'tw-search-namespace)
 
-(defmacro my=interactive-lambda (&rest body)
+(defmacro tw-interactive-lambda (&rest body)
   "Thanks to https://emacs.stackexchange.com/a/10198/36619"
   (let ((x (macroexp-parse-body body)))
     `(lambda () ,@(car x) (interactive)
        ,@(cdr x))))
 
-(defalias 'my=il 'my=interactive-lambda)
+(defalias 'tw-il 'tw-interactive-lambda)
 
-(defun my=flash-active-buffer ()
+(defun tw-flash-active-buffer ()
   "Blip background color of the active buffer."
   (interactive)
   (run-at-time "200 millisec" nil
@@ -466,28 +466,28 @@ E.g.:
                 'default
                 'flash-active-buffer-face)))
 
-(setq my=iedit-mode nil)
-;; (defvar my=iedit-mode nil) ;; TRY defvar
+(setq tw-iedit-mode nil)
+;; (defvar tw-iedit-mode nil) ;; TRY defvar
 
-(defun my=iedit-mode-toggle ()
+(defun tw-iedit-mode-toggle ()
   "Match only occurrences in current function and the comment right above it."
   (interactive)
-  ;; TODO when C-g pressed and (= my=iedit-mode t) then (setq my=iedit-mode nil)
-  (if my=iedit-mode
+  ;; TODO when C-g pressed and (= tw-iedit-mode t) then (setq tw-iedit-mode nil)
+  (if tw-iedit-mode
       (progn
         (evil-iedit-state/quit-iedit-mode)
-        (setq my=iedit-mode nil))
+        (setq tw-iedit-mode nil))
     (progn
       ;; 0 means: only occurrences in current ...
       (evil-iedit-state/iedit-mode 0)
       ;; (evil-iedit-state/iedit-mode) ;; M-H iedit-restrict-function
-      (setq my=iedit-mode t))))
+      (setq tw-iedit-mode t))))
 
-(defun my=eval-current-defun1 (arg)
+(defun tw-eval-current-defun1 (arg)
   "Doesn't work if there's a \"\" or () at the end of the function"
   (interactive "P")
   (let* ((point-pos (point)))
-    (while (and (not (my=is-defun))
+    (while (and (not (tw-is-defun))
                 (not (= (point) (point-min))))
       (sp-backward-symbol))
     (if t ;; (not (= point-pos (point)))
@@ -505,7 +505,7 @@ E.g.:
 ;;   (defun bf ()
 ;;     (defun cf ())))
 
-(defun my=eval-current-defun2 (arg)
+(defun tw-eval-current-defun2 (arg)
   (interactive "P")
   (let* ((point-pos (point)))
     ;; (end-of-line)
@@ -519,7 +519,7 @@ E.g.:
     ;; (message (format "search-backward"))
     (goto-char point-pos)))
 
-(defun my=eval-current-defun (arg)
+(defun tw-eval-current-defun (arg)
   "Evaluate the current i.e. inner def un.
 E.g. in the (def un a () (def un b () (def un c ()))) this function allows
 selective evaluation 'c' or 'b' or 'a' according to the point possition in
@@ -536,22 +536,22 @@ TODO still buggy - when not in a defun it evaluates preceding defun"
     (eval-last-sexp arg)
     (goto-char point-pos)))
 
-(defun my=elisp-insert-message ()
+(defun tw-elisp-insert-message ()
   "See `lv-message' for semi-permanent hints, not interfering
 with the Echo Area."
   (interactive)
-  (my=insert-str "(message \"%s\" )" 1))
+  (tw-insert-str "(message \"%s\" )" 1))
 
-(defun my=elisp-insert-defun ()
+(defun tw-elisp-insert-defun ()
   (interactive)
   (yas-expand-snippet (yas-lookup-snippet "defun")))
 
-(defun my=elisp-insert-lambda ()
+(defun tw-elisp-insert-lambda ()
   (interactive)
   ;; (yas-expand-snippet (yas-lookup-snippet "lambda"))
-  (my=insert-str "lambda " 0))
+  (tw-insert-str "lambda " 0))
 
-(defun my=cider-save-and-load-current-buffer ()
+(defun tw-cider-save-and-load-current-buffer ()
   "TODO call `cider-repl-set-ns' only if `cider-load-file' succeeded"
   (interactive)
   (when (buffer-modified-p)
@@ -564,105 +564,105 @@ with the Echo Area."
   ;; (cider-switch-to-relevant-repl-buffer nil)
   )
 
-(defun my=cider-reload-ns-from-file ()
+(defun tw-cider-reload-ns-from-file ()
   "TODO get the filename from (cider-current-ns) and reload it"
   (interactive)
   (message "[%s] cider-current-ns %s"
-           'my=cider-reload-ns-from-file
+           'tw-cider-reload-ns-from-file
            (cider-current-ns))
-  ;; (my=cider-switch-to-repl-buffer)
-  ;; (my=cider-save-and-load-current-buffer)
+  ;; (tw-cider-switch-to-repl-buffer)
+  ;; (tw-cider-save-and-load-current-buffer)
   )
 
-(defun my=clj-insert-debugd ()
+(defun tw-clj-insert-debugd ()
   (interactive)
   (let* ((msg (if (equal major-mode 'clojurescript-mode)
                   "(.log js/console \"\")"
                 "(debugf \"\")"
                 ;; "(println \"\")"
                 )))
-    (my=insert-str msg 2)))
+    (tw-insert-str msg 2)))
 
-(defun my=scheme-insert-log ()
+(defun tw-scheme-insert-log ()
   (interactive)
   (let* ((msg "(format #t \"\\n\")"))
-    (my=insert-str msg 4)))
+    (tw-insert-str msg 4)))
 
-(defun my=racket-insert-log ()
+(defun tw-racket-insert-log ()
   (interactive)
-  (my=insert-str "(printf \"\\n\")" 4))
+  (tw-insert-str "(printf \"\\n\")" 4))
 
-(defun my=scheme-insert-let* ()
+(defun tw-scheme-insert-let* ()
   (interactive)
-  (my=insert-str "(let* [])" 2))
+  (tw-insert-str "(let* [])" 2))
 
-(defun my=clj-insert-remove-fn ()
+(defun tw-clj-insert-remove-fn ()
   (interactive)
-  (my=insert-str "(remove (fn []))" 3))
+  (tw-insert-str "(remove (fn []))" 3))
 
-(defun my=clj-insert-filter-fn ()
+(defun tw-clj-insert-filter-fn ()
   (interactive)
-  (my=insert-str "(filter (fn []))" 3))
+  (tw-insert-str "(filter (fn []))" 3))
 
-(defun my=clj-insert-type ()
+(defun tw-clj-insert-type ()
   (interactive)
-  (my=insert-str "(type )" 1))
+  (tw-insert-str "(type )" 1))
 
-(defun my=clj-insert-map-fn ()
+(defun tw-clj-insert-map-fn ()
   (interactive)
-  (my=insert-str "(map (fn []))" 3))
+  (tw-insert-str "(map (fn []))" 3))
 
-(defun my=clj-insert-let ()
+(defun tw-clj-insert-let ()
   (interactive)
   ;; (cljr-introduce-let) ; TODO see docu for cljr-introduce-let
-  (my=insert-str "(let [])" 2))
+  (tw-insert-str "(let [])" 2))
 
-(defun my=elisp-insert-let ()
+(defun tw-elisp-insert-let ()
   (interactive)
-  (my=insert-str "(let (()))" 3))
+  (tw-insert-str "(let (()))" 3))
 
-(defun my=clj-insert-for ()
+(defun tw-clj-insert-for ()
   (interactive)
-  (my=insert-str "(for [])" 2))
+  (tw-insert-str "(for [])" 2))
 
-(defun my=insert-clojuredocs ()
+(defun tw-insert-clojuredocs ()
   (interactive)
-  (my=insert-str "clojuredocs"))
+  (tw-insert-str "clojuredocs"))
 
-(defun my=clj-insert-comp ()
+(defun tw-clj-insert-comp ()
   (interactive)
-  (my=insert-str "((comp ))" 2))
+  (tw-insert-str "((comp ))" 2))
 
-(defun my=insert-partial ()
+(defun tw-insert-partial ()
   (interactive)
-  (my=insert-str "partial " 1))
+  (tw-insert-str "partial " 1))
 
-(defun my=racket-insert-fn ()
+(defun tw-racket-insert-fn ()
   (interactive)
-  (my=insert-str "(lambda ())" 2))
+  (tw-insert-str "(lambda ())" 2))
 
-(defun my=clj-insert-fn ()
+(defun tw-clj-insert-fn ()
   (interactive)
-  (my=insert-str "(fn [])" 2))
+  (tw-insert-str "(fn [])" 2))
 
-(defun my=clj-insert-def ()
+(defun tw-clj-insert-def ()
   (interactive)
-  (my=insert-str "(def )" 1))
+  (tw-insert-str "(def )" 1))
 
-(defun my=clj-insert-defn ()
+(defun tw-clj-insert-defn ()
   (interactive)
-  (my=insert-str "(defn [])" 3))
+  (tw-insert-str "(defn [])" 3))
 
-(defun my=clj-insert-doseq ()
+(defun tw-clj-insert-doseq ()
   (interactive)
-  (my=insert-str "(doseq [])" 2))
+  (tw-insert-str "(doseq [])" 2))
 
-(defun my=clj-insert-do ()
+(defun tw-clj-insert-do ()
   (interactive)
-  (my=insert-str "(do)" 1))
+  (tw-insert-str "(do)" 1))
 
-(defun my=point-max-p () (= (point) (point-max)))
-(defalias 'my=end-of-file-p 'my=point-max-p)
+(defun tw-point-max-p () (= (point) (point-max)))
+(defalias 'tw-end-of-file-p 'tw-point-max-p)
 
 (defun current-line-empty-p ()
   (save-excursion
@@ -670,10 +670,10 @@ with the Echo Area."
     (looking-at-p "[[:space:]]*$")))
 
 ;; TODO Implement using the `spacemacs/toggle'
-(defun my=toggle-reader-comment-fst-sexp-on-line (sexp-comment)
+(defun tw-toggle-reader-comment-fst-sexp-on-line (sexp-comment)
   "If line starts with a line comment, toggle the comment.
 Otherwise toggle the reader comment."
-  (if (and (current-line-empty-p) (my=end-of-file-p))
+  (if (and (current-line-empty-p) (tw-end-of-file-p))
       (progn
         (message "Point at the end-of-file. No toggle-comment done."))
     (let* ((point-pos1 (point)))
@@ -712,96 +712,96 @@ Otherwise toggle the reader comment."
                   (insert sexp-comment)
                   (goto-char (+ point-pos1 sexp-comment-len)))))))))))
 
-(defun my=racket-toggle-reader-comment-fst-sexp-on-line ()
+(defun tw-racket-toggle-reader-comment-fst-sexp-on-line ()
   (interactive)
-  (my=toggle-reader-comment-fst-sexp-on-line "#;"))
+  (tw-toggle-reader-comment-fst-sexp-on-line "#;"))
 
-(defun my=clj-toggle-reader-comment-fst-sexp-on-line (&optional arg)
+(defun tw-clj-toggle-reader-comment-fst-sexp-on-line (&optional arg)
   "When invoked with prefix <C u 2> it toggles two forms - for key-value pair"
   (interactive "p")
-  (my=toggle-reader-comment-fst-sexp-on-line
+  (tw-toggle-reader-comment-fst-sexp-on-line
    (if (eq 2 arg)
        "#_#_"
      "#_")))
 
-(defun my=elisp-toggle-reader-comment-current-sexp (&optional arg)
+(defun tw-elisp-toggle-reader-comment-current-sexp (&optional arg)
   "emacs-lisp doesn't have a syntax for sexp-comment.
 TODO finish the implementation"
   (interactive "p")
   ;; (mark-sexp)
   (spacemacs/comment-or-uncomment-lines arg))
 
-(defun my=racket-toggle-reader-comment-current-sexp ()
+(defun tw-racket-toggle-reader-comment-current-sexp ()
   (interactive)
   (newline-and-indent)
-  (my=racket-toggle-reader-comment-fst-sexp-on-line))
+  (tw-racket-toggle-reader-comment-fst-sexp-on-line))
 
-(defun my=clj-toggle-reader-comment-current-sexp ()
+(defun tw-clj-toggle-reader-comment-current-sexp ()
   (interactive)
   (newline-and-indent)
-  (my=clj-toggle-reader-comment-fst-sexp-on-line))
+  (tw-clj-toggle-reader-comment-fst-sexp-on-line))
 
-(defun my=helm-mini ()
+(defun tw-helm-mini ()
   ;; (define-key helm-map (kbd "s-a") nil)
   ;; (unbind-key (kbd "s-a") helm-map)
   (when (boundp 'helm-map)
     (define-key helm-map (kbd "s-a") 'helm-next-line)
     (define-key helm-map (kbd "s-]") 'helm-next-line)))
 
-(defun my=find-ai-scrbl ()
+(defun tw-find-ai-scrbl ()
   "Edit the `$dev/notes/notes/ai.scrbl', in the current window."
   (interactive)
   (find-file-existing (format "%s/notes/notes/ai.scrbl" (getenv "dev"))))
 
-(defun my=find-dotf-spacemacs ()
+(defun tw-find-dotf-spacemacs ()
   "Edit the `$dotf/.spacemacs', in the current window."
   (interactive)
   (find-file-existing (format "%s/.spacemacs" (getenv "dotf"))))
 
-(defun my=find-dotf-spguimacs ()
+(defun tw-find-dotf-spguimacs ()
   "Edit the `$dotf/.spguimacs', in the current window."
   (interactive)
   (find-file-existing (format "%s/.spguimacs" (getenv "dotf"))))
 
-(defun my=find-home-config.scm ()
+(defun tw-find-home-config.scm ()
   "Edit the `$dotf/.../home-config-<hostname>.scm', in the current window."
   (interactive)
   (find-file-existing
    (format "%s/guix/home/home-config-%s.scm" (getenv "dotf") (system-name))))
 
-(defun my=find-syst-config.scm ()
+(defun tw-find-syst-config.scm ()
   "Edit the `$dotf/.../<hostname>.scm', in the current window."
   (interactive)
   (find-file-existing
    (format "%s/guix/systems/%s.scm" (getenv "dotf") (system-name))))
 
-(defun my=find-spguimacs-packages.scm ()
+(defun tw-find-spguimacs-packages.scm ()
   "Edit the `$dotf/.../spguimacs-packages.scm', in the current window."
   (interactive)
   (find-file-existing
    (format "%s/guix/home/cfg/spguimacs-packages.scm" (getenv "dotf"))))
 
-(defun my=cider-clear-compilation-highlights ()
+(defun tw-cider-clear-compilation-highlights ()
   (interactive)
   (cider-clear-compilation-highlights t))
 
-(defun my=repl-insert-cmd (s)
+(defun tw-repl-insert-cmd (s)
   (cider-switch-to-repl-buffer)
   (insert s))
 
-(defun my=stop-synths-metronoms ()
+(defun tw-stop-synths-metronoms ()
   (interactive)
-  (my=repl-insert-cmd "(stop)")
+  (tw-repl-insert-cmd "(stop)")
   (cider-repl-return))
 
-(defun my=magit-status ()
+(defun tw-magit-status ()
   (interactive)
-  (my=save-all-buffers)
+  (tw-save-all-buffers)
   (magit-status))
 
-(defun my=cider-insert-and-format (form)
+(defun tw-cider-insert-and-format (form)
   (interactive)
-  (my=repl-insert-cmd (concat (mapconcat 'identity form "\n")))
+  (tw-repl-insert-cmd (concat (mapconcat 'identity form "\n")))
   (evil-normal-state)
   (evil-jump-item)
   (dolist (line (cdr form))
@@ -809,9 +809,9 @@ TODO finish the implementation"
     (cider-repl-tab))
   (evil-append-line 0))
 
-(defun my=cider-unmap-this-ns ()
+(defun tw-cider-unmap-this-ns ()
   (interactive)
-  (my=cider-insert-and-format
+  (tw-cider-insert-and-format
    `(
      ;; "(map #(ns-unmap *ns* %) (keys (ns-interns *ns*)))"
      "(->> [*ns*]"
@@ -820,9 +820,9 @@ TODO finish the implementation"
      "                   (map (fn [symb] (ns-unmap nspace symb)))))))"
      )))
 
-(defun my=cider-browse-this-ns ()
+(defun tw-cider-browse-this-ns ()
   (interactive)
-  (my=cider-insert-and-format
+  (tw-cider-insert-and-format
    `(
      "(->> [*ns*]"
      "     (map (fn [nspace]"
@@ -830,16 +830,16 @@ TODO finish the implementation"
      "                   ))))"
      )))
 
-(defun my=cider-browse-all-ns (namespace)
+(defun tw-cider-browse-all-ns (namespace)
   "E.g.:
-(my=cider-browse-all-ns \"jim.jones\")
+(tw-cider-browse-all-ns \"jim.jones\")
 
 Evil substitute / replace command:
   \\='<,\\='>s/\(.*\)/\"\\1\"/
   "
   (interactive)
   (let* ((nspace (list (concat "\"" namespace "\""))))
-    (my=cider-insert-and-format
+    (tw-cider-insert-and-format
      `(
        "(let [ns-prefix " ,@nspace "]"
        "  (->> (all-ns)"
@@ -852,13 +852,13 @@ Evil substitute / replace command:
        "                     #_(map (fn [symb] (ns-unmap nspace symb)))))))))"
        ))))
 
-(defun my=cider-unmap-all-ns (namespace)
+(defun tw-cider-unmap-all-ns (namespace)
   "Substitute / replace:
 \\='<,\\='>s/\(.*\)/\"\\1\"/
 "
   (interactive)
   (let* ((nspace (list (concat "\"" namespace "\""))))
-    (my=cider-insert-and-format
+    (tw-cider-insert-and-format
      `(
        "(let [ns-prefix " ,@nspace "]"
        "  (->> (all-ns)"
@@ -870,7 +870,7 @@ Evil substitute / replace command:
        "                     (map (fn [symb] (ns-unmap nspace symb))))))))"
        ))))
 
-(defun my=save-all-buffers ()
+(defun tw-save-all-buffers ()
   "Thanks to https://stackoverflow.com/a/30468232"
   (interactive)
   (save-some-buffers
@@ -912,16 +912,16 @@ Evil substitute / replace command:
 ;; 1. list all symbols
 ;; 2. check that a given symbol a mode-symbol
 
-;; add the 'my=save-last-edited-buffer to the hooks of the given mode
+;; add the 'tw-save-last-edited-buffer to the hooks of the given mode
 
 ;; (dolist (mode (buffer-list))
 ;;   (message "%s; relevant %s"
 ;;            mode
-;;            (if (provided-mode-derived-p (my=buffer-major-mode mode)
+;;            (if (provided-mode-derived-p (tw-buffer-major-mode mode)
 ;;                                         'prog-mode 'text-mode)
 ;;                ;; (add-hook 'after-change-functions 'feng-buffer-change-hook)
-;;                (add-hook (get-hook (my=buffer-major-mode mode))
-;;                          'my=save-last-edited-buffer))))
+;;                (add-hook (get-hook (tw-buffer-major-mode mode))
+;;                          'tw-save-last-edited-buffer))))
 
 ;; https://github.com/bbatsov/projectile/issues/442#issuecomment-59659969
 ;; (require 'dash)
@@ -940,7 +940,7 @@ Evil substitute / replace command:
             (eval cmd)))))))
 
 ;; From https://www.emacswiki.org/emacs/DiredOmitMode
-(defun my=dired-dotfiles-toggle ()
+(defun tw-dired-dotfiles-toggle ()
   "Show/hide dot-files"
   (interactive)
   (when (equal major-mode 'dired-mode)
@@ -954,15 +954,15 @@ Evil substitute / replace command:
       (progn (revert-buffer) ; otherwise just revert to re-show
              (set (make-local-variable 'dired-dotfiles-show-p) t)))))
 
-(defun my=dired-do-delete ()
+(defun tw-dired-do-delete ()
   (interactive)
   (let ((old-val dired-deletion-confirmer))
-    ;; (message "[%s] old-val: %s" 'my=dired-do-delete old-val)
+    ;; (message "[%s] old-val: %s" 'tw-dired-do-delete old-val)
     (setq dired-deletion-confirmer '(lambda (_) t))
     (dired-do-delete)
     (setq dired-deletion-confirmer old-val)))
 
-(defun my=delete-window ()
+(defun tw-delete-window ()
   (interactive)
   (let ((win-list (window-list)))
     (if (funcall (-compose (-partial #'equal 1)
@@ -974,9 +974,9 @@ Evil substitute / replace command:
         (spacemacs/alternate-buffer)
       (delete-window (selected-window)))))
 
-(defun my=ins-left-paren ()
+(defun tw-ins-left-paren ()
   "Simulate key press" (interactive) (execute-kbd-macro (kbd "(")))
-(defun my=ins-right-paren ()
+(defun tw-ins-right-paren ()
   "Simulate key press" (interactive) (execute-kbd-macro (kbd ")")))
 
 ;; (defun matches-a-buffer-name? (name)
@@ -989,7 +989,7 @@ Evil substitute / replace command:
   (and (member bufname (mapcar #'buffer-name (buffer-list)))
        t))
 
-(defun my=toggle-shell-pop-some-term (term-type &optional ARG)
+(defun tw-toggle-shell-pop-some-term (term-type &optional ARG)
   "term-type is 'term or 'multiterm.
 
 Consider:
@@ -1009,7 +1009,7 @@ Consider:
        ;; If inside a terminal buffer then close / delete it.
        ;; 'term-mode' works apparently also for multiterm
        ((equal 'term-mode major-mode)
-        (my=delete-window))
+        (tw-delete-window))
 
        ;; can't use (let ...) inside cond
        ((buffer-exists-p default-buffer)
@@ -1028,15 +1028,15 @@ Consider:
          ((equal term-type 'term)      (spacemacs/shell-pop-term ARG)))))
       (balance-windows-area))))
 
-(defun my=toggle-shell-pop-term (&optional ARG)
+(defun tw-toggle-shell-pop-term (&optional ARG)
   (interactive)
-  (my=toggle-shell-pop-some-term 'term ARG))
+  (tw-toggle-shell-pop-some-term 'term ARG))
 
-(defun my=toggle-shell-pop-multiterm (&optional ARG)
+(defun tw-toggle-shell-pop-multiterm (&optional ARG)
   (interactive)
-  (my=toggle-shell-pop-some-term 'multiterm ARG))
+  (tw-toggle-shell-pop-some-term 'multiterm ARG))
 
-(defun my=dired-sort ()
+(defun tw-dired-sort ()
   "Sort dired dir listing in different ways.
 Prompt for a choice.
 URL `http://xahlee.info/emacs/emacs/dired_sort.html'
@@ -1055,7 +1055,7 @@ Version: 2018-12-23 2022-04-07"
 ;; It's better not to redefine or advise `revert-buffer'. There are plenty of
 ;; Lisp calls to revert-buffer, and you don't want to affect their behavior. You
 ;; probably want to change the behavior only for interactive calls.
-(defun my=revert-buffer-no-confirm ()
+(defun tw-revert-buffer-no-confirm ()
   "Revert buffer without confirmation."
   (interactive) (revert-buffer t t))
 
@@ -1064,17 +1064,17 @@ Version: 2018-12-23 2022-04-07"
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Windows.html#Window%20Group
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Coordinates-and-Windows.html
 
-(defun my=adjust-point-pos-before-search (&optional COUNT)
+(defun tw-adjust-point-pos-before-search (&optional COUNT)
   (interactive)
   (evil-scroll-line-to-center COUNT)
-  ;; (setq my=line-before (line-number-at-pos))
+  ;; (setq tw-line-before (line-number-at-pos))
   )
 
 ;; TODO very long files might overflow the number-var
-(defun my=adjust-point-pos-after-search (&optional COUNT)
+(defun tw-adjust-point-pos-after-search (&optional COUNT)
   (interactive)
   (evil-scroll-line-to-center COUNT)
-  ;; (let* ((bef my=line-before)
+  ;; (let* ((bef tw-line-before)
   ;;        (aft (line-number-at-pos))
   ;;        (height (window-height))
   ;;        (diff (abs (- aft bef)))
@@ -1100,7 +1100,7 @@ Version: 2018-12-23 2022-04-07"
 
 ;; === END adjust-point-pos-after-search
 
-(defun my=org-babel-demarcate-block-fish (&optional arg)
+(defun tw-org-babel-demarcate-block-fish (&optional arg)
   "Wrap or split the code in the region or on the point.
 When called from inside of a code block the current block is
 split.  When called from outside of a code block a new code block
@@ -1160,35 +1160,35 @@ block of the same language with the previous."
               (goto-char start)
               (move-end-of-line 1)))))
 
-(defun my=org-babel-demarcate-block-fish-with-results (&optional arg)
+(defun tw-org-babel-demarcate-block-fish-with-results (&optional arg)
   (interactive)
   (let ((current-buffer-name (buffer-name)))
     (when (and (string= "*scratch*" current-buffer-name)
                (not (eq 'org-mode major-mode)))
       (with-current-buffer current-buffer-name
         (org-mode))))
-  (my=org-babel-demarcate-block-fish arg)
+  (tw-org-babel-demarcate-block-fish arg)
   (org-babel-insert-header-arg "results" "replace output"))
 
 ;; The url is from
 ;;   ~/.spacemacs.d/layers/+web-services/search-engine/packages.el
-(setq my=search-url "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
+(setq tw-search-url "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
 
-(defun my=search-or-browse (&optional args)
+(defun tw-search-or-browse (&optional args)
   "'&optional args' must be declared otherwise the key binding doesn't work.
 Selected text has higher priority than URL. A YouTube URL is
 immediately opened by `browse-url-firefox', anything else is put
-on prompt with the `my=search-url' prefix and handled by
+on prompt with the `tw-search-url' prefix and handled by
 `browse-url-firefox'."
   (interactive "p")
   (funcall
    (-compose
     #'browse-url-firefox
-    ;; (-partial #'message "[my=search-or-browse] url: %s"))
+    ;; (-partial #'message "[tw-search-or-browse] url: %s"))
    (cond
     ((or (region-active-p) (evil-visual-state-p))
      ;; Select text as if done from the insert state.
-     (format my=search-url
+     (format tw-search-url
              (read-string "[firefox] search region: "
                           (buffer-substring-no-properties (region-beginning)
                                                           (region-end)))))
@@ -1204,11 +1204,11 @@ on prompt with the `my=search-url' prefix and handled by
      (thing-at-point 'url))
 
     (t
-     (format my=search-url
+     (format tw-search-url
              (read-string "[firefox] search thing: "
                           (thing-at-point 'symbol))))))))
 
-(defmacro my=def-evar (elisp-var def-val evar-name)
+(defmacro tw-def-evar (elisp-var def-val evar-name)
   "Define an Emacs variable from environment with defaults. Warn if
 differences were encountered."
   `(let* ((evar-val (or (getenv ,evar-name) ,def-val)))
@@ -1217,7 +1217,7 @@ differences were encountered."
        (message "WARN def-val %s and evar %s=%s differ"
                 ,def-val ,evar-name evar-val))))
 
-(defun my=range (&optional start end step)
+(defun tw-range (&optional start end step)
   "Should behave like `range' in Clojure.
 
    Generate a list of numbers from START to END, incrementing by STEP.
