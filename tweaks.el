@@ -19,20 +19,31 @@
 ;; and then
 ;;   (tweaks :location "<path/to/the/cloned-repo>")
 
+;;; TODO byte-compilation warnings (? bc autoloading / lazy loading ? ):
+;;; the function ‘cider-load-file’ is not known to be defined.
+;;; the function ‘cider--infer-ports’ is not known to be defined.
+;;; the function ‘cider-switch-to-repl-buffer’ is not known to be defined.
+(require 'cider-repl) ;; cider-repl-tab, etc.
+
 (require 'copy-sexp)
+(require 'dired)
 (require 'drag-stuff)
+(require 'evil)
+(require 'evil-iedit-state) ;; evil-iedit-state/quit-iedit-mode
 (require 'jump-last)
 (require 'kill-buffers)
-(require 'ob-core)
-(require 'evil)
-(require 'dired)
 (require 'magit)
+(require 'ob-core)
 (require 'yasnippet)
 
-;; TODO lazy loading
-(provide 'zoom-frm) ;; zoom-all-frames-in, zoom-all-frames-out
-(require 'evil-iedit-state) ;; evil-iedit-state/quit-iedit-mode
-(require 'cider-repl) ;; cider-repl-tab, etc.
+;;; TODO byte-compilation warnings (? bc autoloading / lazy loading ? ):
+;;; the function ‘zoom-all-frames-out’ is not known to be defined.
+;;; the function ‘zoom-all-frames-in’ is not known to be defined.
+;;;
+;;; TODO this doesn't work. Is it bc #'zoom-all-frames-in is autoloaded?
+;;; (unless (functionp #'zoom-all-frames-in)
+;;;   (require 'zoom-frm))
+(require 'zoom-frm) ;; zoom-all-frames-in, zoom-all-frames-out
 
 (defun tw-escape-quotes (Begin End)
   "Add slash before double quote in current line or selection.
@@ -177,8 +188,8 @@ Example: (tw-buffer-mode (current-buffer))"
   (message "%s" zoom-function))
 
 (defun tw-zoom-all-frames-in ()
-    (interactive)
-    (tw-zoom-all-frames #'zoom-all-frames-in))
+  (interactive)
+  (tw-zoom-all-frames #'zoom-all-frames-in))
 
 (defun tw-zoom-all-frames-out ()
   (interactive)
