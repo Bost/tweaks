@@ -1196,7 +1196,8 @@ on prompt with the `tw-search-url' prefix and handled by
   (funcall
    (-compose
     #'browse-url-firefox
-    ;; (-partial #'message "[tw-search-or-browse] url: %s"))
+    ;; (lambda (p) (message "[tw-search-or-browse] url: %s" p) p)
+    )
    (cond
     ((or (region-active-p) (evil-visual-state-p))
      ;; Select text as if done from the insert state.
@@ -1218,7 +1219,7 @@ on prompt with the `tw-search-url' prefix and handled by
     (t
      (format tw-search-url
              (read-string "[firefox] search thing: "
-                          (thing-at-point 'symbol))))))))
+                          (thing-at-point 'symbol)))))))
 
 (defmacro tw-def-evar (elisp-var def-val evar-name)
   "Define an Emacs variable from environment with defaults. Warn if
