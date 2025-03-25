@@ -1,6 +1,6 @@
 ;;; tweaks.el --- Various tweaks.                    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 - 2024 Rostislav Svoboda
+;; Copyright (C) 2020 - 2025 Rostislav Svoboda
 
 ;; Authors: Rostislav Svoboda <Rostislav.Svoboda@gmail.com>
 ;; Version: 0.1
@@ -56,11 +56,11 @@ Version: 2017-01-11"
        (list (region-beginning) (region-end))
      (list (line-beginning-position) (line-end-position))))
   (save-excursion
-      (save-restriction
-        (narrow-to-region Begin End)
-        (goto-char (point-min))
-        (while (search-forward "\"" nil t)
-          (replace-match "\\\"" t t)))))
+    (save-restriction
+      (narrow-to-region Begin End)
+      (goto-char (point-min))
+      (while (search-forward "\"" nil t)
+        (replace-match "\\\"" t t)))))
 
 (defun tw-unescape-quotes (Begin End)
   "Replace  「\\\"」 by 「\"」 in current line or selection.
@@ -955,11 +955,11 @@ Evil substitute / replace command:
                    (is-interactive (interactive-form cmd))
                    (local-map (or (current-local-map) (make-keymap))))
       (define-key local-map key
-        (lambda ()
-          (interactive)
-          (if is-interactive
-              (call-interactively cmd)
-            (eval cmd)))))))
+                  (lambda ()
+                    (interactive)
+                    (if is-interactive
+                        (call-interactively cmd)
+                      (eval cmd)))))))
 
 ;; From https://www.emacswiki.org/emacs/DiredOmitMode
 (defun tw-dired-dotfiles-toggle ()
@@ -1081,7 +1081,7 @@ Version: 2018-12-23 2022-04-07"
   "Revert buffer without confirmation."
   (interactive) (revert-buffer t t))
 
-;; === BEG adjust-point-pos-after-search
+;; ### BEG adjust-point-pos-after-search
 ;; See:
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Basic-Windows.html#Window%20Group
 ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Coordinates-and-Windows.html
@@ -1120,7 +1120,7 @@ Version: 2018-12-23 2022-04-07"
 ;; (line-number-at-pos (match-beginning 0))
 ;; (line-number-at-pos (match-end 0))
 
-;; === END adjust-point-pos-after-search
+;; ### END adjust-point-pos-after-search
 
 (defun tw-org-babel-demarcate-block-fish (&optional arg)
   "Wrap or split the code in the region or on the point.
@@ -1133,14 +1133,14 @@ When called within blank lines after a code block, create a new code
 block of the same language with the previous."
   (interactive "P")
   (let* ((info (org-babel-get-src-block-info 'no-eval))
-               (start (org-babel-where-is-src-block-head))
+         (start (org-babel-where-is-src-block-head))
          ;; `start' will be nil when within space lines after src block.
-               (block (and start (match-string 0)))
-               (headers (and start (match-string 4)))
-               (stars (concat (make-string (or (org-current-level) 1) ?*) " "))
-               (upper-case-p (and block
-                                              (let (case-fold-search)
-                                                (string-match-p "#\\+BEGIN_SRC" block)))))
+         (block (and start (match-string 0)))
+         (headers (and start (match-string 4)))
+         (stars (concat (make-string (or (org-current-level) 1) ?*) " "))
+         (upper-case-p (and block
+                            (let (case-fold-search)
+                              (string-match-p "#\\+BEGIN_SRC" block)))))
     (if (and info start) ;; At src block, but not within blank lines after it.
         (mapc
          (lambda (place)
@@ -1148,39 +1148,39 @@ block of the same language with the previous."
              (goto-char place)
              (let ((lang (nth 0 info))
                    (indent (make-string (org-current-text-indentation) ?\s)))
-                     (when (string-match "^[[:space:]]*$"
+               (when (string-match "^[[:space:]]*$"
                                    (buffer-substring (line-beginning-position)
                                                      (line-end-position)))
                  (delete-region (line-beginning-position) (line-end-position)))
                (insert (concat
-                                    (if (looking-at "^") "" "\n")
-                                    indent (if upper-case-p "#+END_SRC\n" "#+end_src\n")
-                                    (if arg stars indent) "\n"
-                                    indent (if upper-case-p "#+BEGIN_SRC " "#+begin_src ")
-                                    lang
-                                    (if (> (length headers) 1)
-                                              (concat " " headers) headers)
-                                    (if (looking-at "[\n\r]")
-                                              ""
-                                            (concat "\n" (make-string (current-column) ? )))))))
-                 (move-end-of-line 2))
+                        (if (looking-at "^") "" "\n")
+                        indent (if upper-case-p "#+END_SRC\n" "#+end_src\n")
+                        (if arg stars indent) "\n"
+                        indent (if upper-case-p "#+BEGIN_SRC " "#+begin_src ")
+                        lang
+                        (if (> (length headers) 1)
+                            (concat " " headers) headers)
+                        (if (looking-at "[\n\r]")
+                            ""
+                          (concat "\n" (make-string (current-column) ? )))))))
+           (move-end-of-line 2))
          (sort (if (org-region-active-p) (list (mark) (point)) (list (point))) #'>))
       (let ((start (point))
-                  (lang "fish")
-                  (body (delete-and-extract-region
-                               (if (org-region-active-p) (mark) (point)) (point))))
-              (insert (concat (if (looking-at "^") "" "\n")
-                                          (if arg (concat stars "\n") "")
-                                          (if upper-case-p "#+BEGIN_SRC " "#+begin_src ")
-                                          lang "\n" body
-                                          (if (or (= (length body) 0)
-                                                        (string-suffix-p "\r" body)
-                                                        (string-suffix-p "\n" body))
-                                              ""
-                                            "\n")
-                                          (if upper-case-p "#+END_SRC\n" "#+end_src\n")))
-              (goto-char start)
-              (move-end-of-line 1)))))
+            (lang "fish")
+            (body (delete-and-extract-region
+                   (if (org-region-active-p) (mark) (point)) (point))))
+        (insert (concat (if (looking-at "^") "" "\n")
+                        (if arg (concat stars "\n") "")
+                        (if upper-case-p "#+BEGIN_SRC " "#+begin_src ")
+                        lang "\n" body
+                        (if (or (= (length body) 0)
+                                (string-suffix-p "\r" body)
+                                (string-suffix-p "\n" body))
+                            ""
+                          "\n")
+                        (if upper-case-p "#+END_SRC\n" "#+end_src\n")))
+        (goto-char start)
+        (move-end-of-line 1)))))
 
 (defun tw-org-babel-demarcate-block-fish-with-results (&optional arg)
   (interactive)
