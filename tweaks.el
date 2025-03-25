@@ -243,7 +243,7 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
               (exchange-point-and-mark)) ;; moving back
           (set-mark (point))
           (right-char (length sel-text))))
-    (spacemacs/hsearch-project-region-or-symbol)
+    (spacemacs/helm-project-smart-do-search-region-or-symbol)
     ;; (message "was-visual-state-p: %s" was-visual-state-p)
     ))
 
