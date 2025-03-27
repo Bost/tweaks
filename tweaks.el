@@ -29,7 +29,6 @@
 (require 'dired)
 (require 'drag-stuff)
 (require 'evil)
-(require 'evil-iedit-state) ;; evil-iedit-state/quit-iedit-mode
 (require 'jump-last)
 (require 'kill-buffers)
 (require 'magit)
