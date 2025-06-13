@@ -1260,4 +1260,60 @@ from the first argument. STEP defaults to 1."
       (setq i (+ i step)))
     (nreverse range-list)))
 
+(defun tw-window-rearrange-layout (split-fn)
+  "Rearrange the current window configuration using SPLIT-FN to split windows.
+SPLIT-FN should be a function like `split-window-below` for vertical layouts or
+`split-window-right` for horizontal layouts."
+  (let ((bufs (mapcar #'window-buffer (window-list))))
+    (delete-other-windows)
+    (set-window-buffer (selected-window) (car bufs))
+    (dolist (buf (cdr bufs))
+      (funcall split-fn)
+      (other-window 1)
+      (set-window-buffer (selected-window) buf))
+    ;; balance the window sizes
+    (balance-windows)))
+
+(defun tw-window-vertical-layout ()
+  "Rearrange the current window configuration into a vertical (top-to-bottom)
+layout."
+  (interactive)
+  (tw-window-rearrange-layout #'split-window-below))
+
+(defun tw-horizontal-layout ()
+  "Rearrange the current window configuration into a horizontal (side-by-side)
+layout."
+  (interactive)
+  (tw-window-rearrange-layout #'split-window-right))
+
+(defun tw-window-toggle-layout ()
+  "Toggle between vertical (top-to-bottom) and horizontal (side-by-side) window
+layouts. If all windows share the same left coordinate (indicating a vertical
+layout), switch to horizontal. Otherwise, switch to vertical."
+  (interactive)
+  (let ((first-edges (window-edges (car (window-list))))
+        (vertical-layout t))
+    (dolist (win (window-list))
+      (when (/= (nth 0 (window-edges win)) (nth 0 first-edges))
+        (setq vertical-layout nil)))
+    (if vertical-layout
+        (tw-horizontal-layout)
+      (tw-window-vertical-layout))))
+
+;; (defun tw-scheme-additional-keywords ()
+;;   "Highlight custom Scheme macros like `if-let` as keywords."
+;;   (font-lock-add-keywords
+;;    nil
+;;    '(("\\<\\(if-not\\|if-let\\|when-let\\|unless\\|unless-let\\)\\>"
+;;       1 font-lock-keyword-face))))
+
+(defvar tw-scheme-keywords
+  '("if-not" "if-let" "when-let" "unless" "unless-let" "if-not")
+  "Custom Scheme macro names to highlight as keywords.")
+
+(defun tw-scheme-additional-keywords ()
+  (font-lock-add-keywords
+   nil
+   `((,(regexp-opt tw-scheme-keywords 'words) . font-lock-keyword-face))))
+
 (provide 'tweaks)
