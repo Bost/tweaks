@@ -777,12 +777,16 @@ TODO finish the implementation"
 (defun tw-find-dotf-spacemacs ()
   "Edit the `$dotf/.spacemacs', in the current window."
   (interactive)
-  (find-file-existing (format "%s/.spacemacs" (getenv "dotf"))))
+  (find-file-existing
+   (format "%s/.emacs.d.distros/spacemacs/develop/cfg/init.el"
+           (getenv "dotf"))))
 
 (defun tw-find-dotf-spguimacs ()
   "Edit the `$dotf/.spguimacs', in the current window."
   (interactive)
-  (find-file-existing (format "%s/.spguimacs" (getenv "dotf"))))
+  (find-file-existing
+   (format "%s/.emacs.d.distros/spacemacs/guix/cfg/init.el"
+           (getenv "dotf"))))
 
 (defun tw-find-home-config.scm ()
   "Edit the `$dotf/.../home-config-<hostname>.scm', in the current window."
