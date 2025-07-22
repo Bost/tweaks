@@ -775,14 +775,14 @@ TODO finish the implementation"
   (find-file-existing (format "%s/notes/notes/ai.scrbl" (getenv "dev"))))
 
 (defun tw-find-dotf-spacemacs ()
-  "Edit the `$dotf/.spacemacs', in the current window."
+  "Edit the Spacemacs init.el, in the current window."
   (interactive)
   (find-file-existing
    (format "%s/.emacs.d.distros/spacemacs/develop/cfg/init.el"
            (getenv "dotf"))))
 
-(defun tw-find-dotf-spguimacs ()
-  "Edit the `$dotf/.spguimacs', in the current window."
+(defun tw-find-dotf-spacemacs-guix ()
+  "Edit the Guix version of Spacemacs init.el, in the current window."
   (interactive)
   (find-file-existing
    (format "%s/.emacs.d.distros/spacemacs/guix/cfg/init.el"
