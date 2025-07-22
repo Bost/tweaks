@@ -1388,4 +1388,22 @@ layout), switch to horizontal. Otherwise, switch to vertical."
    `((,(regexp-opt tw-scheme-macros 'words) . ' tw-scheme-user-macro-face))
    ))
 
+(defun tw-evil-find-file-at-point-with-line-other-window ()
+  "Like `evil-find-file-at-point-with-line`, but open in another window.
+Supports filenames with spaces, parentheses, and optional :LINE suffix.
+
+TODO:
+/tmp/file.pdf       ; matching
+/tmp/file (1).pdf   ; not matching
+/tmp/file  (1).pdf  ; matching
+
+(global-set-key (kbd \"C-c C-v\")
+                #'tw-evil-find-file-at-point-with-line-other-window)"
+  (interactive)
+  ;; (split-window-right-and-focus)
+  (popwin:popup-buffer (current-buffer)
+                       ;; :noselect t
+                       :width 0.5 :position 'right)
+  (evil-find-file-at-point-with-line))
+
 (provide 'tweaks)
