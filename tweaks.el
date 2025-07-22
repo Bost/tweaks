@@ -999,6 +999,16 @@ Evil substitute / replace command:
       (spacemacs/alternate-buffer)
     (delete-window (selected-window))))
 
+(defun tw-delete-other-windows ()
+  (interactive)
+  ;; See definitions of `treemacs'
+  (pcase (treemacs-current-visibility)
+    ('visible (delete-window (treemacs-get-local-window)))
+    ;; ('exists  (treemacs-select-window))
+    ;; ('none    (treemacs--init))
+    )
+  (delete-other-windows))
+
 (defun tw-ins-left-paren ()
   "Simulate key press" (interactive) (execute-kbd-macro (kbd "(")))
 (defun tw-ins-right-paren ()
@@ -1405,5 +1415,16 @@ TODO:
                        ;; :noselect t
                        :width 0.5 :position 'right)
   (evil-find-file-at-point-with-line))
+
+(defun tw-shell-readlink (file)
+  "Execute the `readlink FILE` command in the current shell."
+  (funcall
+   (-compose
+    ;; TODO implement fallback to bash if fish not found
+    #'string-trim-right
+    #'shell-command-to-string
+    (lambda (strings) (string-join strings " "))
+    (-partial #'list "readlink"))
+   file))
 
 (provide 'tweaks)
