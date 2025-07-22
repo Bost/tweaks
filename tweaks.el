@@ -1311,13 +1311,81 @@ layout), switch to horizontal. Otherwise, switch to vertical."
 ;;    '(("\\<\\(if-not\\|if-let\\|when-let\\|unless\\|unless-let\\)\\>"
 ;;       1 font-lock-keyword-face))))
 
-(defvar tw-scheme-keywords
-  '("if-not" "if-let" "when-let" "unless" "unless-let" "if-not")
-  "Custom Scheme macro names to highlight as keywords.")
+;; (defface tw-scheme-user-macro-face
+;;   '((t :foreground "white"
+;;        :background "DarkOrange"
+;;        :weight bold
+;;        :underline t
+;;        :slant italic))
+;;   "Custom face for user-defined Scheme macros.")
+
+;; (defface tw-scheme-user-macro-face
+;;   '((t :inherit font-lock-keyword-face
+
+;;        ;; :underline t
+;;        ;; :underline (:style line)
+;;        ;; :underline (:color "SkyBlue" :style line)
+
+;;        :slant italic ; Curvy, stylized forms (often different shapes)
+;;        ;; :slant oblique ; pseudo-italics, same glyphs as normal, just slanted
+
+;;        ;; :weight bold
+
+;;        ;; :foreground "DeepSkyBlue1"
+;;        ;; :foreground "chartreuse"
+;;        ;; :foreground "orange"
+;;        ;; :foreground "brown"
+
+;;        ;; :background "color" doesn't work here
+;;        ))
+;;   "Face for user-defined Scheme macros.")
+
+(defface tw-scheme-user-macro-face
+  '((t :inherit font-lock-keyword-face
+       :slant italic
+       ;; :foreground "SlateGray1"
+       ))
+  "Face for user-defined utility Scheme procedures.")
+
+(defvar tw-scheme-macros
+  '("if-let" "if-not" "evaluating-module" "module-evaluated"
+    "testsymb" "testsymb-trace" "def\\*" "def-public")
+  "Keywords representing user-defined macros for highlighting.")
+
+(defface tw-scheme-user-util-face
+  '((t ;; :inherit hl-line
+     :weight bold
+     ))
+  "Face for user-defined utility Scheme procedures.")
+
+(defvar tw-scheme-utils
+  '("comp" "partial" "juxt" "str" "boolean" "empty\\?" "member\\?" "has-suffix\\?"
+    "ends-with\\?" "has-substring\\?" "drop-right" "drop-left" "flatten"
+    "dbg" "dbg-exec" "error-command-failed" "contains--gx-dry-run\\?"
+    "exec-or-dry-run" "exec-system\\*" "exec-system\\*-new"
+    "exec-or-dry-run-new" "exec-with-error-to-string" "exec" "exec-background"
+    "cmd->string" "pipe-return" "pipe-bind" "guix-shell-return"
+    "guix-shell-bind" "guix-shell-dry-run-bind" "mdelete-file" "mcopy-file"
+    "string-in\\?" "remove-element" "remove-all-elements" "mktmpfile"
+    "url\\?" "plist-get" "directory-exists\\?" "symbolic-link\\?" "true\\?"
+    "false\\?" "syntax->list" "drop-last" "drop-last-smart"
+    "butlast" "butlast-smart" "take-smart" "drop-smart" "take-last"
+    "take-last-smart" "cartesian" "interleave" "combine"
+    "read-all" "read-all-sexprs" "read-all-syntax" "read-all-strings"
+    "analyze-pids-flag-variable" "analyze-pids-call/cc" "compute-cmd"
+    "build" "package-output-paths" "path" "cnt")
+  "Keywords representing user-defined utility procedures for highlighting.")
 
 (defun tw-scheme-additional-keywords ()
   (font-lock-add-keywords
    nil
-   `((,(regexp-opt tw-scheme-keywords 'words) . font-lock-keyword-face))))
+   ;; `((,(regexp-opt tw-scheme-keywords 'words) . font-lock-keyword-face))
+   `((,(regexp-opt tw-scheme-utils 'words) . 'tw-scheme-user-util-face))
+   )
+  (font-lock-add-keywords
+   nil
+   ;; `((,(regexp-opt tw-scheme-keywords 'words) . font-lock-keyword-face))
+   `((,(regexp-opt tw-scheme-macros 'words) . ' tw-scheme-user-macro-face))
+   ))
 
 (provide 'tweaks)
