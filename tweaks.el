@@ -1427,4 +1427,61 @@ TODO:
     (-partial #'list "readlink"))
    file))
 
+(defun tw-frame-color-parameters ()
+  "Return all color-related frame parameters."
+  (dolist (frame (frame-list))
+    (dolist (param '(background-color
+                     foreground-color
+                     cursor-color
+                     mouse-color
+                     background-mode))
+      (message "param %s : %s"
+               param
+               (frame-parameter nil param)))))
+
+(defun tw-reset-all-faces ()
+  "Completely reset all faces to Emacs defaults."
+  (interactive)
+  (mapc (lambda (theme)
+          (ignore-errors
+            (disable-theme theme)))
+        (custom-available-themes))
+
+  (dolist (face (face-list))
+    (set-face-attribute face nil
+                        :foreground 'unspecified
+                        :background 'unspecified
+                        :family     'unspecified
+                        :slant      'unspecified
+                        :weight     'unspecified
+                        :height     'unspecified
+                        :underline  'unspecified
+                        :box        'unspecified
+                        :inherit    'unspecified))
+
+  (modify-all-frames-parameters
+   '((background-color . "white")
+     (foreground-color . "black")
+     (cursor-color . "black")
+     (mouse-color . "black")
+     (background-mode . light)))
+
+  (setq custom-enabled-themes nil)
+  (setq frame-background-mode nil)
+  (enable-theme 'user)
+
+  (redraw-display))
+
+(defun tw-get-current-theme-name ()
+  "Get the name of the current theme as a string, or nil if none."
+  (when-let ((theme (car custom-enabled-themes)))
+    (symbol-name theme)))
+
+(defun tw-reload-current-theme ()
+  (interactive)
+  (let ((current-theme (car custom-enabled-themes)))
+    (tw-reset-all-faces)
+    ;; t - theme is safe
+    (load-theme current-theme t)))
+
 (provide 'tweaks)
