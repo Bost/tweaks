@@ -997,7 +997,9 @@ Evil substitute / replace command:
                                                       #'window-buffer)))
                (window-list))
       (spacemacs/alternate-buffer)
-    (delete-window (selected-window))))
+    ;; By default selected window is deleted. No need for
+    ;; `(delete-window (selected-window))'
+    (delete-window)))
 
 (defun tw-delete-other-windows ()
   (interactive)
