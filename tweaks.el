@@ -14,7 +14,7 @@
 ;; In `dotspacemacs-additional-packages' add:
 ;;   (tweaks :location
 ;;           (recipe :fetcher github :repo "Bost/tweaks"))
-;; or after cloning repo
+;; or after cloning repo:
 ;;   (tweaks :location "<path/to/the/cloned-repo>")
 
 ;;; TODO byte-compilation warnings (? bc autoloading / lazy loading ? ):
