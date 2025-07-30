@@ -9,14 +9,12 @@
 ;; URL: https://github.com/Bost/tweaks
 
 ;;; Installation:
-;; In the `dotspacemacs/user-config', add there:
+;; In `dotspacemacs/user-config' add:
 ;;   (use-package tweaks)
-;; then, in the `dotspacemacs-additional-packages', add there:
+;; In `dotspacemacs-additional-packages' add:
 ;;   (tweaks :location
 ;;           (recipe :fetcher github :repo "Bost/tweaks"))
-;; or:
-;;   $ git clone https://github.com/Bost/tweaks
-;; and then
+;; or after cloning repo
 ;;   (tweaks :location "<path/to/the/cloned-repo>")
 
 ;;; TODO byte-compilation warnings (? bc autoloading / lazy loading ? ):
