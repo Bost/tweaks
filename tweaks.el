@@ -1513,4 +1513,27 @@ line."
   (save-excursion
     (re-search-forward "\\S-" (line-end-position) t)))
 
+(defun tw-toggle-comment-sexp-lines ()
+  "Comment or uncomment the current sexp, using multi-line comment style.
+See also:
+https://github.com/abo-abo/lispy
+https://github.com/remyferre/comment-dwim-2
+https://github.com/noctuid/lispyville
+lisp/newcomment.el in the Emacs source code"
+  (interactive)
+  (let ((bounds (sp-get-comment-bounds)))
+    (if bounds
+        ;; Already in comment → uncomment
+        (uncomment-region (car bounds) (cdr bounds))
+      ;; Not in comment → comment the sexp
+      (when (tw-non-ws-before-point-p)
+        (sp-backward-sexp)
+        (sp-forward-sexp)
+        ;; Insert newline only when there is something after the current sexp
+        (when (tw-non-ws-after-point-p)
+          (sp-newline)))
+      ;; `if' accepts multiple forms in the `else' branch
+      (mark-sexp)
+      (comment-dwim nil))))
+
 (provide 'tweaks)
