@@ -1484,4 +1484,21 @@ TODO:
     ;; t - theme is safe
     (load-theme current-theme t)))
 
+(defun tw-setup-lisp-comments ()
+  "Set up multi-line comment style for Lisp code."
+  (setq-local comment-style 'multi-line)
+  (setq-local comment-continue ";;"))
+
+;; Wrapper function for automatic mode detection
+(defun tw-setup-lisp-comments-maybe ()
+  "Set up Lisp comments if in a Lisp-like mode."
+  (when (derived-mode-p
+         'lisp-mode
+         'emacs-lisp-mode
+         'scheme-mode
+         'clojure-mode
+         'racket-mode
+         )
+    (tw-setup-lisp-comments)))
+
 (provide 'tweaks)
