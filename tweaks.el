@@ -1501,4 +1501,16 @@ TODO:
          )
     (tw-setup-lisp-comments)))
 
+(defun tw-non-ws-before-point-p ()
+  "Return non-nil if there are non-whitespace chars before point on the
+same line."
+  (save-excursion
+    (re-search-backward "\\S-" (line-beginning-position) t)))
+
+(defun tw-non-ws-after-point-p ()
+  "Return non-nil if there are non-whitespace chars after point on the same
+line."
+  (save-excursion
+    (re-search-forward "\\S-" (line-end-position) t)))
+
 (provide 'tweaks)
