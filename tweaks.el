@@ -1,12 +1,15 @@
-;;; tweaks.el --- Various tweaks.                    -*- lexical-binding: t; -*-
+;;; tweaks.el --- Various tweaks                    -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020 - 2025 Rostislav Svoboda
 
 ;; Authors: Rostislav Svoboda <Rostislav.Svoboda@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((copy-sexp "0.1") (drag-stuff "0.1") (jump-last "0.1") (kill-buffers "0.1"))
+;; Package-Requires: ((emacs "28.1") (copy-sexp "0.1") (drag-stuff "0.1") (jump-last "0.1") (kill-buffers "0.1"))
 ;; Keywords: convenience
 ;; URL: https://github.com/Bost/tweaks
+
+;;; Commentary:
+;; Various tweaks.
 
 ;;; Installation:
 ;; In `dotspacemacs/user-config' add:
@@ -16,6 +19,8 @@
 ;;           (recipe :fetcher github :repo "Bost/tweaks"))
 ;; or after cloning repo:
 ;;   (tweaks :location "<path/to/the/cloned-repo>")
+
+;;; Code:
 
 ;;; TODO byte-compilation warnings (? bc autoloading / lazy loading ? ):
 ;;; the function ‘cider-load-file’ is not known to be defined.
@@ -77,7 +82,7 @@ Version: 2017-01-11"
         (replace-match "\"" t t)))))
 
 (defun tw-shell-which (command)
-  "Execute the \\='which\\=' command in the current shell"
+  "Execute the `\\='which\\=' COMMAND` in the current shell."
   (funcall
    (-compose
     ;; TODO implement fallback to bash if fish not found
@@ -87,13 +92,14 @@ Version: 2017-01-11"
     (-partial #'list "which"))
    command))
 
-(defun tw-what-face (pos)
+(defun tw-what-face (position)
+  "Show face at POSITION."
   ;; see also C-u C-x =
   (interactive "d")
   ;; (clojure-mode)
   (let ((face (or (get-char-property (point) 'read-face-name)
                   (get-char-property (point) 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+    (if face (message "Face: %s" face) (message "No face at %d" position))))
 
 ;;; hlt-highlight-region needs (require 'highlight), otherwise it throws an
 ;;; error: "hlt-highlight-region undefined".
@@ -131,7 +137,7 @@ Example: (tw-buffer-mode (current-buffer))"
     major-mode))
 
 (defun tw-other-window ()
-  "straight jump to the next window: SPC 0, SPC 1 ..."
+  "Straight jump to the next window: SPC 0, SPC 1, etc."
   (interactive)
   (other-window 1)
   ;; (tw-flash-active-buffer)
@@ -908,10 +914,8 @@ Evil substitute / replace command:
       ((and buffer-file-name (derived-mode-p 'org-mode)))))))
 
 (defun all-major-mode-variants (symb-name)
-  (let (
-        ;; The `symbol-name' returns a string. Convert it to symbol
-        (s-sym (intern symb-name))
-        )
+  ;; The `symbol-name' returns a string. Convert it to symbol
+  (let ((s-sym (intern symb-name)))
     (if (get s-sym 'derived-mode-parent) s-sym)))
 
 ;; TODO have a look at the `fundamental-mode'
@@ -1025,8 +1029,9 @@ Evil substitute / replace command:
        t))
 
 (defun tw-toggle-shell-pop-some-term (term-type &optional ARG)
-  "term-type is \\='term\\=' or \\='multiterm\\='.
-
+  "TERM-TYPE is \\='term\\=' or \\='multiterm\\='.
+ ARG is used in `spacemacs/shell-pop-multiterm' and
+ `spacemacs/shell-pop-term'.
 Consider:
 1. defining SHELL_PATH environment variable
 2. setting:
@@ -1038,8 +1043,7 @@ Consider:
     (let* ((index 0)
            (default-buffer
             ;; "*Default-multiterm-0*"
-            (format "*Default-%s-%s*" term-type index)
-            ))
+            (format "*Default-%s-%s*" term-type index)))
       (cond
        ;; If inside a terminal buffer then close / delete it.
        ;; 'term-mode' works apparently also for multiterm
@@ -1051,8 +1055,7 @@ Consider:
         (progn
           (message "##### (buffer-exists-p %s): t" default-buffer)
           ;; (display-buffer default-buffer)
-          (pop-to-buffer default-buffer)
-          ))
+          (pop-to-buffer default-buffer)))
 
        (t
         (message "##### else: (buffer-exists-p %s): nil " default-buffer)
@@ -1205,9 +1208,9 @@ block of the same language with the previous."
   (tw-org-babel-demarcate-block-fish arg)
   (org-babel-insert-header-arg "results" "replace output"))
 
-;; The url is from
-;;   ~/.spacemacs.d/layers/+web-services/search-engine/packages.el
-(setq tw-search-url "https://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
+;; The url is from the `search-engine-alist' in Spacemacs
+;;   layers/+web-services/search-engine/packages.el
+(setq tw-search-url "https://duckduckgo.com/?q=%s")
 
 (defun tw-search-or-browse (&optional args)
   "'&optional args' must be declared otherwise the key binding doesn't work.
@@ -1537,3 +1540,5 @@ lisp/newcomment.el in the Emacs source code"
       (comment-dwim nil))))
 
 (provide 'tweaks)
+
+;;; tweaks.el ends here
