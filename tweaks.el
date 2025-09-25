@@ -1402,6 +1402,12 @@ layout), switch to horizontal. Otherwise, switch to vertical."
     "smart-fifth"
     "smart-take"
     "smart-drop"
+    "split-on-whitespace"
+    "pr-str"
+    "pr-str-with-quote"
+    "ensure-list"
+    "keyword->string"
+    ;; "install-recursively" ; procedure is neither public nor exported
     )
   "Keywords representing user-defined utility procedures for highlighting.")
 
