@@ -1355,14 +1355,15 @@ layout), switch to horizontal. Otherwise, switch to vertical."
 
 (defface tw-scheme-user-macro-face
   '((t :inherit font-lock-keyword-face
-       :slant italic
+       ;; :slant italic
+       :weight bold
        ;; :foreground "SlateGray1"
        ))
   "Face for user-defined utility Scheme procedures.")
 
 (defvar tw-scheme-macros
   '("if-let" "if-not" "evaluating-module" "module-evaluated"
-    "testsymb" "testsymb-trace" "def\\*" "def-public")
+    "testsymb" "testsymb-trace" "def\*" "def-public")
   "Keywords representing user-defined macros for highlighting.")
 
 (defface tw-scheme-user-util-face
@@ -1387,7 +1388,21 @@ layout), switch to horizontal. Otherwise, switch to vertical."
     "take-last-smart" "cartesian" "interleave" "combine"
     "read-all" "read-all-sexprs" "read-all-syntax" "read-all-strings"
     "analyze-pids-flag-variable" "analyze-pids-call/cc" "compute-cmd"
-    "build" "package-output-paths" "path" "cnt")
+    "build" "package-output-paths" "path" "cnt"
+    "url\?"
+    "compose-commands-guix-shell"
+    "compose-commands-guix-shell-dry-run"
+    "compose-shell-commands"
+    "dbg-packages-to-install"
+    "smart-first"
+    "smart-last"
+    "smart-second"
+    "smart-third"
+    "smart-fourth"
+    "smart-fifth"
+    "smart-take"
+    "smart-drop"
+    )
   "Keywords representing user-defined utility procedures for highlighting.")
 
 (defun tw-scheme-additional-keywords ()
