@@ -1363,7 +1363,13 @@ layout), switch to horizontal. Otherwise, switch to vertical."
 
 (defvar tw-scheme-macros
   '("if-let" "if-not" "evaluating-module" "module-evaluated"
-    "testsymb" "testsymb-trace" "def\*" "def-public")
+    "testsymb"
+    "testsymb-trace"
+    "def"
+    "def\*"
+    "def-public"
+    "def\*-public"
+    )
   "Keywords representing user-defined macros for highlighting.")
 
 (defface tw-scheme-user-util-face
@@ -1382,7 +1388,42 @@ layout), switch to horizontal. Otherwise, switch to vertical."
     "cmd->string" "pipe-return" "pipe-bind" "guix-shell-return"
     "guix-shell-bind" "guix-shell-dry-run-bind" "mdelete-file" "mcopy-file"
     "string-in\?" "remove-element" "remove-all-elements" "mktmpfile"
-    "url\?" "plist-get" "directory-exists\?" "symbolic-link\?" "true\?"
+    "url\?"
+    "plist\?"
+    "plist-get"
+    "plist-set"
+    "plist-set!"
+
+    "get-keywords"
+    "plist-keys"
+    "plist-vals"
+    "get-keyworded-vals"
+    "get-non-keyworded-vals"
+    "keyworded-plist\?"
+
+
+    "some"
+    "every\?"
+    "not-any\?"
+    "not-every\?"
+    "some-true\?"
+    "every-true\?"
+    "has-duplicates\?"
+
+    "writeable-usb-mounted\?"
+    "sha1-string"
+    "string-checksum"
+    "timestamp"
+    "sha1-file"
+    "inc"
+    "str-join"
+
+    "map-indexed"
+    "padding-string"
+    "nonempty-dotted-list\?"
+    "flat-list-cond"
+
+    "directory-exists\?" "symbolic-link\?" "true\?"
     "false\?" "syntax->list" "drop-last" "drop-last-smart"
     "butlast" "butlast-smart" "take-smart" "drop-smart" "take-last"
     "take-last-smart" "cartesian" "interleave" "combine"
@@ -1407,6 +1448,16 @@ layout), switch to horizontal. Otherwise, switch to vertical."
     "pr-str-with-quote"
     "ensure-list"
     "keyword->string"
+    "s\+"
+    "s-"
+    "sx"
+    "module-name-for-logging"
+    "pretty-print->string"
+    "pretty-print-with-comments->string"
+    "unspecified-or-empty-or-false?"
+    "split-string"
+    "smart-split-string"
+    "string-split-whitespace"
     ;; "install-recursively" ; procedure is neither public nor exported
     )
   "Keywords representing user-defined utility procedures for highlighting.")
