@@ -1,6 +1,6 @@
 ;;; tweaks.el --- Various tweaks                    -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 - 2025 Rostislav Svoboda
+;; Copyright (C) 2020 - 2026 Rostislav Svoboda
 
 ;; Authors: Rostislav Svoboda <Rostislav.Svoboda@gmail.com>
 ;; Version: 0.1
@@ -778,19 +778,26 @@ TODO finish the implementation"
   (interactive)
   (find-file-existing (format "%s/notes/notes/ai.scrbl" (getenv "dev"))))
 
-(defun tw-find-dotf-spacemacs ()
-  "Edit the Spacemacs init.el, in the current window."
-  (interactive)
+(defun tw-find-dotf-spacemacs (branch)
   (find-file-existing
-   (format "%s/.emacs.d.distros/spacemacs/develop/cfg/init.el"
+   (format "%s/.emacs.d.distros/spacemacs/%s/cfg/init.el"
+           branch
            (getenv "dotf"))))
 
-(defun tw-find-dotf-spacemacs-guix ()
-  "Edit the Guix version of Spacemacs init.el, in the current window."
+(defun tw-find-dotf-spacemacs-develop ()
+  "Edit the Spacemacs init.el from the develop-brach, in the current window."
   (interactive)
-  (find-file-existing
-   (format "%s/.emacs.d.distros/spacemacs/guix/cfg/init.el"
-           (getenv "dotf"))))
+  (tw-find-dotf-spacemacs "develop"))
+
+(defun tw-find-dotf-spacemacs-guix ()
+  "Edit the Spacemacs init.el from the guix-brach, in the current window."
+  (interactive)
+  (tw-find-dotf-spacemacs "guix"))
+
+(defun tw-find-dotf-spacemacs-spguix ()
+  "Edit the Spacemacs init.el from the spguix-brach, in the current window."
+  (interactive)
+  (tw-find-dotf-spacemacs "spguix"))
 
 (defun tw-find-home-config.scm ()
   "Edit the `$dotf/.../home-config-<hostname>.scm', in the current window."
