@@ -781,8 +781,9 @@ TODO finish the implementation"
 (defun tw-find-dotf-spacemacs (branch)
   (find-file-existing
    (format "%s/.emacs.d.distros/spacemacs/%s/cfg/init.el"
+           (getenv "dotf")
            branch
-           (getenv "dotf"))))
+           )))
 
 (defun tw-find-dotf-spacemacs-develop ()
   "Edit the Spacemacs init.el from the develop-brach, in the current window."
