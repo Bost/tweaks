@@ -1618,6 +1618,10 @@ lisp/newcomment.el in the Emacs source code"
           (sp-newline)))
       ;; `if' accepts multiple forms in the `else' branch
       (mark-sexp)
+      ;; Make sure the `transient-mark-mode' is on so that the `comment-dwin'
+      ;; calls `comment-region'
+      (unless transient-mark-mode
+        (transient-mark-mode 1))
       (comment-dwim nil))))
 
 (provide 'tweaks)
