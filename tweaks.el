@@ -795,10 +795,10 @@ TODO finish the implementation"
   (interactive)
   (tw-find-dotf-spacemacs "guix"))
 
-(defun tw-find-dotf-spacemacs-spguix ()
-  "Edit the Spacemacs init.el from the spguix-brach, in the current window."
+(defun tw-find-dotf-spacemacs-spgx ()
+  "Edit the Spacemacs init.el from the spgx-brach, in the current window."
   (interactive)
-  (tw-find-dotf-spacemacs "spguix"))
+  (tw-find-dotf-spacemacs "spgx"))
 
 (defun tw-find-home-config.scm ()
   "Edit the `$dotf/.../home-config-<hostname>.scm', in the current window."
