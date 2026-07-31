@@ -998,18 +998,20 @@ Evil substitute / replace command:
     (dired-do-delete)
     (setq dired-deletion-confirmer old-val)))
 
+(require 'cl-lib)
+
 (defun tw-delete-window ()
   (interactive)
-  (if (funcall (-compose (-partial #'equal 1)
-                         #'length
-                         #'delete-dups
-                         (-partial #'mapcar (-compose #'buffer-name
-                                                      #'window-buffer)))
-               (window-list))
-      (spacemacs/alternate-buffer)
-    ;; By default selected window is deleted. No need for
-    ;; `(delete-window (selected-window))'
-    (delete-window)))
+  (delete-window)
+  ;; (if (funcall (-compose (-partial #'equal 1)
+  ;;                        #'length
+  ;;                        (-lambda (buffers)
+  ;;                          (cl-remove-duplicates buffers :test #'eq))
+  ;;                        (-partial #'mapcar #'window-buffer))
+  ;;              (window-list nil 'no-minibuf))
+  ;;     (spacemacs/alternate-buffer)
+  ;;   (delete-window))
+  )
 
 (defun tw-delete-other-windows ()
   (interactive)
