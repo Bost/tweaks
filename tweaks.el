@@ -801,16 +801,16 @@ TODO finish the implementation"
   (tw-find-dotf-spacemacs "spgx"))
 
 (defun tw-find-home-config.scm ()
-  "Edit the `$dotf/.../home-config-<hostname>.scm', in the current window."
+  "Edit the `$dotf/.../home-<hostname>.scm', in the current window."
   (interactive)
   (find-file-existing
-   (format "%s/guix/home/home-config-%s.scm" (getenv "dotf") (system-name))))
+   (format "%s/guix/home/home-%s.scm" (getenv "dotf") (system-name))))
 
 (defun tw-find-syst-config.scm ()
-  "Edit the `$dotf/.../<hostname>.scm', in the current window."
+  "Edit the `$dotf/.../syst-<hostname>.scm', in the current window."
   (interactive)
   (find-file-existing
-   (format "%s/guix/systems/%s.scm" (getenv "dotf") (system-name))))
+   (format "%s/guix/systems/syst-%s.scm" (getenv "dotf") (system-name))))
 
 (defun tw-find-spguimacs-packages.scm ()
   "Edit the `$dotf/.../spguimacs-packages.scm', in the current window."
