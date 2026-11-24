@@ -47,6 +47,148 @@
 ;;;   (require 'zoom-frm))
 (require 'zoom-frm) ;; zoom-all-frames-in, zoom-all-frames-out
 
+(defvar my-spell-checking-max-buffer-size (* 512 1024)
+  "Buffer size in bytes at which automatic spellchecking is skipped.")
+
+(defun tw-enable-spell-checking-for-small-buffer ()
+  "Enable automatic spellchecking only below the buffer size limit."
+  (when (save-restriction
+          (widen)
+          (< (1- (position-bytes (point-max)))
+             my-spell-checking-max-buffer-size))
+    (if (derived-mode-p 'prog-mode)
+        (flyspell-prog-mode)
+      (flyspell-mode 1))))
+
+(defun tw-koboldcpp ()
+  "Setup gptel. koboldcpp is a fork of llama.cpp."
+  (interactive)
+  (setq
+   gptel-model 'test
+   gptel-backend
+   (gptel-make-openai "koboldcpp"     ; Any name
+                      :stream t       ; Stream responses
+                      :protocol "http"
+                      :host "edge:5001"
+                      :models '(test) ; Any names, doesn't matter for Llama
+                      )))
+
+(defvar my-env-secrets-file
+  (expand-file-name "~/.env-secrets.gpg")
+  "Encrypted Bash-style environment file.")
+
+(defun tw-load-env-secrets ()
+  "Decrypt `my-env-secrets-file`, let Bash source it, and import env vars."
+  (interactive)
+  (let ((decrypted-buffer (generate-new-buffer " *my-env-secrets-decrypted*"))
+        (env-buffer (generate-new-buffer " *my-env-secrets-env*")))
+    (unwind-protect
+        (progn
+          ;; Decrypt the file into a temporary Emacs buffer.
+          (with-current-buffer decrypted-buffer
+            (let ((status
+                   (call-process
+                    "gpg"
+                    nil
+                    decrypted-buffer
+                    nil
+                    "--quiet"
+                    "--for-your-eyes-only"
+                    "--decrypt"
+                    my-env-secrets-file)))
+              (unless (eq status 0)
+                (error "Failed to decrypt %s" my-env-secrets-file))))
+
+          ;; Let Bash parse the decrypted file.
+          ;;
+          ;; Bash has no long option for `-c`.
+          ;; `-c` means: execute the following string as Bash code.
+          ;;
+          ;; `--noprofile` means: do not read Bash profile files.
+          ;; `--norc` means: do not read ~/.bashrc.
+          ;;
+          ;; `env --null` prints environment entries separated by NUL bytes.
+          (with-current-buffer decrypted-buffer
+            (let ((status
+                   (call-process-region
+                    (point-min)
+                    (point-max)
+                    "bash"
+                    nil
+                    env-buffer
+                    nil
+                    "--noprofile"
+                    "--norc"
+                    "-c"
+                    "source /dev/stdin >/dev/null && env --null")))
+              (unless (eq status 0)
+                (error "Failed to source decrypted env file with Bash"))))
+
+          ;; Import Bash's resulting environment into Emacs.
+          (with-current-buffer env-buffer
+            (dolist (entry (split-string (buffer-string) "\0" t))
+              (when (string-match "\\`\\([^=]+\\)=\\(.*\\)\\'" entry)
+                (setenv (match-string 1 entry)
+                        (match-string 2 entry))))))
+
+      ;; Ensure decrypted secrets do not remain in buffers.
+      (kill-buffer decrypted-buffer)
+      (kill-buffer env-buffer))))
+
+(defun tw-getenv-required (variable)
+  "Return environment VARIABLE or signal a helpful error."
+  (or (getenv variable)
+      (user-error "Missing required environment variable: %s" variable)))
+
+(defun tw-getenv-secret (variable)
+  "Load encrypted env secrets, then return required environment VARIABLE."
+  (tw-load-env-secrets)
+  (tw-getenv-required variable))
+
+(defun tw-erc-libera-server ()
+  "Return the ERC server specification for Libera.Chat."
+  (tw-load-env-secrets)
+  (let ((nick (tw-getenv-required "IRC_USER"))
+        (password (tw-getenv-required "IRC_PASSWD")))
+    `("irc.libera.chat"
+      :port 6697
+      :ssl t
+      :nick ,nick
+      :user ,nick
+      :password ,password)))
+
+(defun tw-load-gptel-key ()
+  "Load OPENAI_KEY from encrypted env file and assign it to `gptel-api-key`."
+  (interactive)
+  (tw-load-env-secrets)
+  (setq gptel-api-key (tw-getenv-secret "OPENAI_KEY"))
+  (message "gptel-api-key loaded"))
+
+(defun tw-shell-path ()
+  ;; (tw-shell-which "fish")
+  (getenv "SHELL")
+  )
+
+(defun tw-org-present-start ()
+  ;; Center the presentation and wrap lines
+  (visual-fill-column-mode 1)
+  (visual-line-mode 1))
+
+(defun tw-org-present-end ()
+  ;; Stop centering the document
+  (visual-fill-column-mode 0)
+  (visual-line-mode 0))
+
+(defun tw-load-layout ()
+  (interactive)
+  (persp-load-state-from-file (concat sp-layouts-dir "/persp-auto-save")))
+
+(defun tw-racket-repl-clear ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    ;; (erase-buffer)
+    (delete-region (point-min) (- (point-max) 2))))
+
 (defun tw-escape-quotes (Begin End)
   "Add slash before double quote in current line or selection.
 Double quote is codepoint 34.
@@ -256,27 +398,48 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
   (let ((evil-this-register ?0))
     (call-interactively 'evil-paste-after)))
 
-(defun tw-evil-select-pasted ()
-  "See also https://emacs.stackexchange.com/a/21093"
+(defun tw-primary-selection-value ()
+  "Read PRIMARY for the default interprogram paste."
+  (let ((select-enable-primary t)
+        (select-enable-clipboard nil))
+    (gui-selection-value)))
+
+(defun tw-paste-from-xsel-clipboard ()
+  "Yank from CLIPBOARD, the selection read by `xsel --clipboard'."
   (interactive)
-  (let ((start-marker (evil-get-marker ?\[))
-        (end-marker (evil-get-marker ?\])))
-    (evil-visual-select start-marker end-marker))
-  ;; moves mark - not great
-  ;; (evil-goto-mark ?\[)
-  ;; (evil-visual-char)
-  ;; (evil-goto-mark ?\])
-  ;; (message "tw-evil-select-pasted - does the same as the macro under: SPC g p")
-  )
+  (let ((interprogram-paste-function #'gui-selection-value)
+        (select-enable-primary nil))
+    (clipboard-yank)))
+
+(defun tw-evil-mark-yanked-text (command &rest args)
+  "Record the bounds left by a yank before Evil adjusts point."
+  (let ((tick (buffer-chars-modified-tick)))
+    (prog1 (apply command args)
+      (let ((other-end (mark t)))
+        (when (and evil-local-mode other-end
+                   (/= tick (buffer-chars-modified-tick))
+                   (/= (point) other-end))
+          (evil-set-marker ?\[ (min (point) other-end))
+          (evil-set-marker ?\] (1- (max (point) other-end))))))))
+
+(dolist (command '(yank yank-pop clipboard-yank mouse-yank-primary))
+  (advice-add command :around #'tw-evil-mark-yanked-text))
+
+(defun tw-evil-select-pasted ()
+  "Visually select the text between Evil's change marks."
+  (interactive)
+  ;; Evil's change marks include the final character.
+  (let ((beg (evil-get-marker ?\[))
+        (end (evil-get-marker ?\])))
+    (unless (and (integerp beg) (integerp end)
+                 (<= (point-min) beg end (point-max))
+                 (< beg (point-max)))
+      (user-error "No pasted text to select"))
+    (evil-visual-select beg (min (1+ end) (point-max)) 'inclusive)))
 
 (defun tw-yank-and-select ()
+  "Yank text and select it in Evil Visual state."
   (interactive)
-  ;; (let ((point-begin (point)))
-  ;;   (clipboard-yank)
-  ;;   (yank)
-  ;;   (evil-visual-make-selection)
-  ;;   (evil-visual-select point-begin (- (point) 1))
-  ;;   (tw-evil-select-pasted))
   (yank)
   (tw-evil-select-pasted))
 
@@ -1560,7 +1723,7 @@ TODO:
 
 (defun tw-get-current-theme-name ()
   "Get the name of the current theme as a string, or nil if none."
-  (when-let ((theme (car custom-enabled-themes)))
+  (when-let* ((theme (car custom-enabled-themes)))
     (symbol-name theme)))
 
 (defun tw-reload-current-theme ()
