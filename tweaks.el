@@ -405,10 +405,15 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
     (gui-selection-value)))
 
 (defun tw-paste-from-xsel-clipboard ()
-  "Yank from CLIPBOARD, the selection read by `xsel --clipboard'."
+  "Yank text from CLIPBOARD, the selection read by `xsel --clipboard'."
   (interactive)
-  (let ((interprogram-paste-function #'gui-selection-value)
-        (select-enable-primary nil))
+  ;; Read CLIPBOARD even when Emacs owns it after a copy.
+  (let ((gui-last-cut-in-clipboard nil)
+        (select-enable-primary nil)
+        (interprogram-paste-function
+         (lambda ()
+           (or (gui-selection-value)
+               (user-error "CLIPBOARD has no text")))))
     (clipboard-yank)))
 
 (defun tw-evil-mark-yanked-text (command &rest args)
