@@ -171,17 +171,55 @@ See `spacemacs/helm-project-smart-do-search-region-or-symbol'"
         (select-enable-clipboard nil))
     (gui-selection-value)))
 
+(defvar tw-yank-clipboard-first nil
+  "When non-nil, ordinary yank uses CLIPBOARD and alternate yank uses PRIMARY.")
+
+(defun tw-toggle-yank-selection ()
+  "Swap the X selections used by ordinary and alternate yank."
+  (interactive)
+  (setq tw-yank-clipboard-first (not tw-yank-clipboard-first))
+  (message "Yank: %s, alternate yank: %s"
+           (if tw-yank-clipboard-first "CLIPBOARD" "PRIMARY")
+           (if tw-yank-clipboard-first "PRIMARY" "CLIPBOARD")))
+
+(defun tw-x-selection-value (primary)
+  "Read X PRIMARY if PRIMARY is non-nil, otherwise read X CLIPBOARD."
+  ;; Read the selection even when Emacs owns it after a copy.
+  (let ((gui-last-cut-in-primary nil)
+        (gui-last-cut-in-clipboard nil)
+        (select-enable-primary primary)
+        (select-enable-clipboard (not primary)))
+    (gui-selection-value)))
+
+(defun tw-yank-selection-value ()
+  "Read the configured X selection for ordinary yank."
+  (if tw-yank-clipboard-first
+      (tw-x-selection-value nil)
+    (tw-primary-selection-value)))
+
+(defun tw-yank-x-selection (primary)
+  "Yank X PRIMARY if PRIMARY is non-nil, otherwise yank X CLIPBOARD."
+  ;; Yank checks this function for external text before using the kill ring.
+  (let ((interprogram-paste-function
+         (lambda ()
+           (or (tw-x-selection-value primary)
+               (user-error "%s has no text" (if primary "PRIMARY" "CLIPBOARD"))))))
+    (clipboard-yank)))
+
 (defun tw-paste-from-xsel-clipboard ()
   "Yank text from CLIPBOARD, the selection read by `xsel --clipboard'."
   (interactive)
-  ;; Read CLIPBOARD even when Emacs owns it after a copy.
-  (let ((gui-last-cut-in-clipboard nil)
-        (select-enable-primary nil)
-        (interprogram-paste-function
-         (lambda ()
-           (or (gui-selection-value)
-               (user-error "CLIPBOARD has no text")))))
-    (clipboard-yank)))
+  (tw-yank-x-selection nil))
+
+(defun tw-yank-configured-selection ()
+  "Yank text from the X selection configured for ordinary yank."
+  (interactive)
+  (tw-yank-x-selection (not tw-yank-clipboard-first)))
+
+(defun tw-yank-alternate-selection ()
+  "Yank text from the X selection other than the one ordinary yank uses."
+  (interactive)
+  (tw-yank-x-selection tw-yank-clipboard-first))
 
 (defun tw-evil-mark-yanked-text (command &rest args)
   "Record the bounds left by a yank before Evil adjusts point."
