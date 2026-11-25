@@ -121,6 +121,71 @@ Repeated invocations toggle between the two most recently open buffers."
   (and (member bufname (mapcar #'buffer-name (buffer-list)))
        t))
 
+(defun tw-evil-keybindings-in-term (map)
+  "Fix evil keybindings in terminals. Alternatively just disable evil-mode:
+  (evil-set-initial-state 'term-mode 'emacs)
+See also:
+- evil-collection-term-setup
+- \"TODO: Add support for normal-state editing.\"
+https://github.com/emacs-evil/evil-collection/blob/master/modes/term/evil-collection-term.el#L61
+"
+  (evil-collection-define-key 'insert map (kbd "S-<up>")   #'previous-line)
+  (evil-collection-define-key 'insert map (kbd "S-<down>") #'next-line)
+  (evil-collection-define-key 'insert map (kbd "C-<up>")   #'previous-line)
+  (evil-collection-define-key 'insert map (kbd "C-<down>") #'next-line)
+  (evil-collection-define-key 'insert map (kbd "<delete>") #'term-send-del)
+  (evil-collection-define-key 'insert map (kbd "<prior>")  #'evil-scroll-page-up)
+  (evil-collection-define-key 'insert map (kbd "<next>")   #'evil-scroll-page-down)
+;;; simple ~<prior>~, ~<next>~ (i.e. pgup / pgdown) don't even get registered by
+;;; Emacs. See: xfconf-query -c xfce4-keyboard-shortcuts -lv | grep Page
+  ;; (evil-collection-define-key 'insert map (kbd "s-<prior>") #'evil-scroll-page-up)
+  ;; (evil-collection-define-key 'insert map (kbd "s-<next>")  #'evil-scroll-page-down)
+  )
+
+(defun tw-resize-shell-to-desired-width ()
+  ;; `shell-pop--is-shell-buffer' is a buffer-local flag set by shell-pop on
+  ;; managed buffers (replaces the removed `shell-pop-last-shell-buffer-name'
+  ;; comparison). `bound-and-true-p' keeps this safe on shell-pop versions
+  ;; that predate the rewrite.
+  (when (and (bound-and-true-p shell-pop--is-shell-buffer)
+;;; The following line is the fix:
+             (shell-pop--split-side-p)
+;;; See implementation of `shell-pop--split-side-p' and
+;;; `spacemacs/resize-shell-to-desired-width' in layers/+tools/shell/funcs.el
+             )
+    (enlarge-window-horizontally (- (/ (* (frame-width) shell-default-width)
+                                       100)
+                                    (window-width)))))
+
+(defmacro tw-make-shell-pop-command (name func &optional shell)
+  "Create a function to open a shell via the function FUNC.
+SHELL is the SHELL function to use (i.e. when FUNC represents a terminal)."
+  `(defun ,(intern (concat "spacemacs/shell-pop-" name)) (index)
+     ,(format (concat "Toggle a popup window with `%S'.\n"
+                      "Multiple shells can be opened with a numerical prefix "
+                      "argument. Using the universal prefix argument will "
+                      "open the shell in the current buffer instead of a "
+                      "popup buffer.")
+              func)
+     (interactive "P")
+     (require 'shell-pop)
+     (if (equal '(4) index)
+         ;; no popup
+         (,func ,shell)
+       (shell-pop--set-shell-type
+        'shell-pop-shell-type
+        (list ,name
+              ,(if (bound-and-true-p layouts-enable-local-variables)
+                   `(concat "*" (spacemacs//current-layout-name) "-"
+                            (if (file-remote-p default-directory)
+                                "remote-"
+                              "")
+                            ,name "*")
+                 (concat "*" name "*"))
+              (lambda nil (,func ,shell))))
+       (shell-pop index)
+       (tw-resize-shell-to-desired-width))))
+
 (defun tw-toggle-shell-pop-some-term (term-type &optional arg)
   "Toggle a Spacemacs terminal of type TERM-TYPE, either 'term or 'multiterm.
 Close the current window if it shows a terminal.  Otherwise, switch

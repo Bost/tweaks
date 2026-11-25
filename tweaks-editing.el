@@ -10,6 +10,61 @@
 (require 'evil)
 (require 'copy-sexp)
 
+(defun tw-enable-hyper-super-modifiers-win32 ()
+  "See https://github.com/fanhongtao/_emacs.d/blob/master/conf/my-key-modifiers.el
+See also 'Have you Hyper for Great Good' https://gist.github.com/toroidal-code/ec075dd05a23a8fb8af0
+Also '<Multi_key> s s' should produce 'ß'
+"
+  (setq
+   ;; w32-pass-apps-to-system nil
+   w32-apps-modifier 'hyper
+   w32-pass-lwindow-to-system nil
+   ;; w32-phantom-key-code 42  ;; what for?
+   w32-lwindow-modifier 'super
+   w32-rwindow-modifier 'alt))
+
+(defun tw-enable-hyper-super-modifiers-linux-x ()
+  (interactive)
+  ;; On nowadays linux, ~<windows>~ key is usually configured to Super
+
+  ;; Menu key as hyper. Examples:
+  ;; * ~H-s-d~:
+  ;;   1. Press ~<menu>~ and release it.
+  ;;   2. Press simultaneously ~<windows>~ and ~d~
+  ;; * ~H-s-<menu>~:
+  ;;   1. Press ~<menu>~ and release it.
+  ;;   2. Press simultaneously ~<windows>~ and ~<menu>~
+  (define-key key-translation-map [menu] #'event-apply-hyper-modifier) ;H-
+  ;; (define-key key-translation-map [apps] #'event-apply-hyper-modifier)
+
+  ;; by default, Emacs bind <menu> to execute-extended-command (same as M-x)
+  ;; now <menu> defined as 'hyper, we need to press <menu> twice to get <H-menu>
+  ;; (global-set-key (kbd "<H-menu>") #'execute-extended-command)
+  ;; (global-unset-key (kbd "<menu>"))
+  ;; (global-unset-key (kbd "<H-menu>"))
+  (message "(tw-enable-hyper-super-modifiers-linux-x) evaluated"))
+
+(defun tw-enable-hyper-super-modifiers ()
+  (let ((frame (framep (selected-frame))))
+    (cond
+     ((memq frame '(w32 win32))
+      (tw-enable-hyper-super-modifiers-win32))
+     ((eq frame 'x)
+      (tw-enable-hyper-super-modifiers-linux-x))
+     ;; ((eq frame 'ns) ...) ;; Mac OS
+     (t
+      (message "%s %s %s"
+               "[tw-enable-hyper-super-modifiers]"
+               "No enabler implemented for the frame:" frame))))
+  ;; I.e. ~C-c h d~ is ~H-d~ i.e.:
+  ;;   1. press and release ~<menu>~
+  ;;   2. press ~d~
+  ;; What following does mean?:
+  ;; you can always use "C-c h" as 'hyper modifier, even in Linux console or DOS
+  (define-key key-translation-map (kbd "C-c h") #'event-apply-hyper-modifier)
+  (define-key key-translation-map (kbd "C-c s") #'event-apply-super-modifier)
+  (define-key key-translation-map (kbd "C-c a") #'event-apply-alt-modifier))
+
 (defun tw-evil-insert ()
   "Switch to evil insert mode."
   ;; (interactive)

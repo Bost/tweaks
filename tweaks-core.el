@@ -234,6 +234,12 @@ large files. Inverse of `tw-shenanigans-on'."
     (define-key helm-map (kbd "s-a") 'helm-next-line)
     (define-key helm-map (kbd "s-]") 'helm-next-line)))
 
+(defun tw-find-ai-conversation ()
+  (interactive)
+  (find-file-existing
+   (format "%s/ai-coding-agents/conversation.org"
+           (getenv "dev"))))
+
 (defun tw-find-ai-scrbl ()
   "Edit the `$dev/notes/notes/ai.scrbl', in the current window."
   (interactive)
