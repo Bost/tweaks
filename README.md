@@ -16,8 +16,23 @@ Emacs utilities for Evil/Spacemacs, Clojure/CIDER, and Scheme development.
 
 ### Vanilla Emacs
 ```elisp
-(load "~/.emacs.d/tweaks.el")  ; after cloning repo
+(load "~/.emacs.d/tweaks/tweaks.el")  ; adjust to the cloned repo
 ```
+
+## Libraries
+
+Loading `tweaks` loads all five libraries. To load just one, add the clone to
+`load-path` and require the feature you want.
+
+| Feature          | Commands and helpers                                           |
+|------------------|----------------------------------------------------------------|
+| `tweaks-core`    | General utilities, Dired, Magit, shell and environment helpers |
+| `tweaks-editing` | Text editing, clipboard, selections, and Evil search           |
+| `tweaks-lisp`    | Lisp editing, Clojure/CIDER, and Scheme highlighting           |
+| `tweaks-org`     | Org presentations and Babel                                    |
+| `tweaks-windows` | Windows, buffers, frames, and themes                           |
+
+`tweaks-lisp` loads `tweaks-editing` for shared insertion helpers.
 
 ## Key Functions
 
