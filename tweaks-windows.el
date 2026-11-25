@@ -7,7 +7,6 @@
 
 ;;; Code:
 
-(require 'cl-lib)
 (require 'evil)
 ;;; TODO byte-compilation warnings (? bc autoloading / lazy loading ? ):
 ;;; the function ‘zoom-all-frames-out’ is not known to be defined.
@@ -122,51 +121,30 @@ Repeated invocations toggle between the two most recently open buffers."
   (and (member bufname (mapcar #'buffer-name (buffer-list)))
        t))
 
-(defun tw-toggle-shell-pop-some-term (term-type &optional ARG)
-  "TERM-TYPE is \\='term\\=' or \\='multiterm\\='.
- ARG is used in `spacemacs/shell-pop-multiterm' and
- `spacemacs/shell-pop-term'.
-Consider:
-1. defining SHELL_PATH environment variable
-2. setting:
-  (setq shell-pop-term-shell SHELL_PATH)
-  (setq multi-term-program SHELL_PATH)"
-  (if (not (cl-find term-type '(multiterm term)))
-      ;; (error "Unknown term-type: %s. Expecting 'term or 'multiterm" term-type)
-      (message "Unknown term-type. Expecting 'term or 'multiterm")
-    (let* ((index 0)
-           (default-buffer
-            ;; "*Default-multiterm-0*"
-            (format "*Default-%s-%s*" term-type index)))
-      (cond
-       ;; If inside a terminal buffer then close / delete it.
-       ;; 'term-mode' works apparently also for multiterm
-       ((equal 'term-mode major-mode)
-        (tw-delete-window))
-
-       ;; can't use (let ...) inside cond
-       ((tw-buffer-exists-p default-buffer)
-        (progn
-          (message "##### (tw-buffer-exists-p %s): t" default-buffer)
-          ;; (display-buffer default-buffer)
-          (pop-to-buffer default-buffer)))
-
-       (t
-        (message "##### else: (tw-buffer-exists-p %s): nil " default-buffer)
-        ;; `spacemacs/shell-pop-term' and `spacemacs/shell-pop-multiterm'
-        ;; are defined in layers/+tools/shell/packages.el
+(defun tw-toggle-shell-pop-some-term (term-type &optional arg)
+  "Toggle a Spacemacs terminal of type TERM-TYPE, either 'term or 'multiterm.
+Close the current window if it shows a terminal.  Otherwise, switch
+to the existing default terminal or open one, passing ARG to its
+Spacemacs shell-pop command."
+  (let ((open-terminal (pcase term-type
+                         ('term #'spacemacs/shell-pop-term)
+                         ('multiterm #'spacemacs/shell-pop-multiterm))))
+    (if (null open-terminal)
+        (message "Unknown term-type. Expecting 'term or 'multiterm")
+      (let ((buffer (get-buffer (format "*Default-%s-0*" term-type))))
         (cond
-         ((equal term-type 'multiterm) (spacemacs/shell-pop-multiterm ARG))
-         ((equal term-type 'term)      (spacemacs/shell-pop-term ARG)))))
+         ((eq major-mode 'term-mode) (tw-delete-window))
+         (buffer (pop-to-buffer buffer))
+         (t (funcall open-terminal arg))))
       (balance-windows-area))))
 
-(defun tw-toggle-shell-pop-term (&optional ARG)
+(defun tw-toggle-shell-pop-term (&optional arg)
   (interactive)
-  (tw-toggle-shell-pop-some-term 'term ARG))
+  (tw-toggle-shell-pop-some-term 'term arg))
 
-(defun tw-toggle-shell-pop-multiterm (&optional ARG)
+(defun tw-toggle-shell-pop-multiterm (&optional arg)
   (interactive)
-  (tw-toggle-shell-pop-some-term 'multiterm ARG))
+  (tw-toggle-shell-pop-some-term 'multiterm arg))
 
 (defun tw-window-rearrange-layout (split-fn)
   "Rearrange the current window configuration using SPLIT-FN to split windows.
