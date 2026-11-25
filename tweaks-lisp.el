@@ -57,7 +57,7 @@ the (^:fold ...) expressions."
        (forward-line)))))
 
 ;; deving on clojure-mode; WARNING: (getenv "dev") is undefined
-(defun load-clojure-mode (file)
+(defun tw-load-clojure-mode (file)
   (if (load-file file)
       (if (string= major-mode "clojure-mode")
           (progn
@@ -267,7 +267,7 @@ with the Echo Area."
 (defun tw-point-max-p () (= (point) (point-max)))
 (defalias 'tw-end-of-file-p 'tw-point-max-p)
 
-(defun current-line-empty-p ()
+(defun tw-current-line-empty-p ()
   (save-excursion
     (beginning-of-line)
     (looking-at-p "[[:space:]]*$")))
@@ -276,7 +276,7 @@ with the Echo Area."
 (defun tw-toggle-reader-comment-fst-sexp-on-line (sexp-comment)
   "If line starts with a line comment, toggle the comment.
 Otherwise toggle the reader comment."
-  (if (and (current-line-empty-p) (tw-end-of-file-p))
+  (if (and (tw-current-line-empty-p) (tw-end-of-file-p))
       (progn
         (message "Point at the end-of-file. No toggle-comment done."))
     (let* ((point-pos1 (point)))

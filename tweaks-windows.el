@@ -116,7 +116,7 @@ Repeated invocations toggle between the two most recently open buffers."
 ;;   "Return non-nil if NAME matches the name of an existing buffer."
 ;;   (try-completion name (mapcar #'buffer-name (buffer-list))))
 
-(defun buffer-exists-p (bufname)
+(defun tw-buffer-exists-p (bufname)
   ;; See also: (lambda (window) (buffer-name (window-buffer window)))
   ;; (and ... t) turns the returned value to 't' or 'nil'
   (and (member bufname (mapcar #'buffer-name (buffer-list)))
@@ -145,14 +145,14 @@ Consider:
         (tw-delete-window))
 
        ;; can't use (let ...) inside cond
-       ((buffer-exists-p default-buffer)
+       ((tw-buffer-exists-p default-buffer)
         (progn
-          (message "##### (buffer-exists-p %s): t" default-buffer)
+          (message "##### (tw-buffer-exists-p %s): t" default-buffer)
           ;; (display-buffer default-buffer)
           (pop-to-buffer default-buffer)))
 
        (t
-        (message "##### else: (buffer-exists-p %s): nil " default-buffer)
+        (message "##### else: (tw-buffer-exists-p %s): nil " default-buffer)
         ;; `spacemacs/shell-pop-term' and `spacemacs/shell-pop-multiterm'
         ;; are defined in layers/+tools/shell/packages.el
         (cond

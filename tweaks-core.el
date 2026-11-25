@@ -298,7 +298,7 @@ large files. Inverse of `tw-shenanigans-on'."
       ((and buffer-file-name (eq major-mode 'emacs-lisp-mode)))
       ((and buffer-file-name (derived-mode-p 'org-mode)))))))
 
-(defun all-major-mode-variants (symb-name)
+(defun tw-all-major-mode-variants (symb-name)
   ;; The `symbol-name' returns a string. Convert it to symbol
   (let ((s-sym (intern symb-name)))
     (if (get s-sym 'derived-mode-parent) s-sym)))
@@ -312,7 +312,7 @@ large files. Inverse of `tw-shenanigans-on'."
 ;;                                      mode 'prog-mode 'text-mode)
 ;;                                     mode))
 ;;                               (remove nil
-;;                                       (mapcar 'all-major-mode-variants
+;;                                       (mapcar 'tw-all-major-mode-variants
 ;;                                               (loop for x being the symbols
 ;;                                                     if (fboundp x)
 ;;                                                     collect
@@ -336,7 +336,7 @@ large files. Inverse of `tw-shenanigans-on'."
 ;;                          'tw-save-last-edited-buffer))))
 
 ;; https://github.com/bbatsov/projectile/issues/442#issuecomment-59659969
-(defun set-local-keymap (&rest bindings)
+(defun tw-set-local-keymap (&rest bindings)
   "For project-specific keybindings"
   (dolist (binding (-partition-in-steps 2 2 bindings))
     (let* ((key (car binding))
