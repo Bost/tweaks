@@ -257,16 +257,6 @@ large files. Inverse of `tw-shenanigans-on'."
   (interactive)
   (tw-find-dotf-spacemacs "develop"))
 
-(defun tw-find-dotf-spacemacs-guix ()
-  "Edit the Spacemacs init.el from the guix-brach, in the current window."
-  (interactive)
-  (tw-find-dotf-spacemacs "guix"))
-
-(defun tw-find-dotf-spacemacs-spgx ()
-  "Edit the Spacemacs init.el from the spgx-brach, in the current window."
-  (interactive)
-  (tw-find-dotf-spacemacs "spgx"))
-
 (defun tw-find-home-config.scm ()
   "Edit the `$dotf/.../home-<hostname>.scm', in the current window."
   (interactive)
